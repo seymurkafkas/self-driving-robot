@@ -26,7 +26,7 @@
         <collision name='ground_coll'>
           <geometry>
             <box>
-              <size>18 32 0.1</size>
+              <size>12 21.3 0.1</size>
             </box>
           </geometry>
           <surface>
@@ -46,7 +46,7 @@
         <visual name='ground_vis'>
           <geometry>
             <box>
-              <size>18 32 0.1</size>
+              <size>12 21.3 0.1</size>
             </box>
           </geometry>
           <material>
