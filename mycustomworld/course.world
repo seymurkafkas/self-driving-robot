@@ -1,14 +1,125 @@
 <sdf version='1.6'>
   <world name='default'>
-      <include>
-          <uri>file://stop</uri>
-      </include>
-      <include>
-          <uri>file://forward</uri>
-      </include>
-      <include>
-          <uri>file://slow</uri>
-      </include>
+    <model name='stop'>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='body'>
+        <visual name='visual'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://stop/stop.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://stop/stop.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+    </model>
+    <model name='forward'>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='body'>
+        <visual name='visual'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://forward/forward.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://forward/forward.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+    </model>
+    <model name='slow'>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='body'>
+        <visual name='visual'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://slow/slow.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://slow/slow.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+    </model>
     <scene>
       <ambient>0 0 0 1</ambient>
       <shadows>0</shadows>
@@ -1198,10 +1309,20 @@
       <pose frame=''>0 0 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>273 700000000</sim_time>
-      <real_time>43 974049332</real_time>
-      <wall_time>1610482241 491184762</wall_time>
-      <iterations>43841</iterations>
+      <sim_time>300 462000000</sim_time>
+      <real_time>26 962682663</real_time>
+      <wall_time>1610898651 222683891</wall_time>
+      <iterations>26762</iterations>
+      <model name='forward'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='body'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
       <model name='ground'>
         <pose frame=''>1 2.3 -0.1 0 -0 0</pose>
         <scale>1 1 1</scale>
@@ -1213,25 +1334,45 @@
         </link>
       </model>
       <model name='mobile_base'>
-        <pose frame=''>2.66693 -0.491704 -0.050246 0.00087 -0.014419 0.836886</pose>
+        <pose frame=''>5.81617 -2.05606 -0.050243 0.000944 -0.014436 1.57748</pose>
         <scale>1 1 1</scale>
         <link name='base_footprint'>
-          <pose frame=''>2.66693 -0.491704 -0.050246 0.00087 -0.014419 0.836886</pose>
-          <velocity>-0.00011 0.000854 3.6e-05 -0.001835 -0.003628 0.001055</velocity>
-          <acceleration>-0.127078 0.097457 0.043091 1.40041 -0.85481 0.034765</acceleration>
-          <wrench>-0.625388 0.479613 0.212064 0 -0 0</wrench>
+          <pose frame=''>5.81617 -2.05606 -0.050243 0.000944 -0.014436 1.57748</pose>
+          <velocity>0.000477 1.6e-05 8.8e-05 -0.000677 0.007812 -0.00171</velocity>
+          <acceleration>0.225781 0.048509 -0.065165 1.89518 -1.32897 1.0301</acceleration>
+          <wrench>1.11114 0.238729 -0.320695 0 -0 0</wrench>
         </link>
         <link name='wheel_left_link'>
-          <pose frame=''>2.58122 -0.41508 -0.014814 -1.56993 0.05748 0.836948</pose>
-          <velocity>-0.000319 0.000828 -0.000415 -0.001835 -0.003628 0.001055</velocity>
-          <acceleration>0.174126 -0.507 1.43878 1.33925 -0.601248 -0.173484</acceleration>
-          <wrench>0.001741 -0.00507 0.014388 0 -0 0</wrench>
+          <pose frame=''>5.70124 -2.05734 -0.014796 -1.56987 0.053604 1.57755</pose>
+          <velocity>0.00075 0.000237 0.000987 -0.000677 0.007812 -0.00171</velocity>
+          <acceleration>-0.16113 0.044923 -0.121841 -3.0665 -1.1216 -2.75994</acceleration>
+          <wrench>-0.001611 0.000449 -0.001218 0 -0 0</wrench>
         </link>
         <link name='wheel_right_link'>
-          <pose frame=''>2.75199 -0.56911 -0.014999 -1.56993 -0.064567 0.836842</pose>
-          <velocity>-0.000155 0.001008 0.000487 -0.001835 -0.003628 0.001055</velocity>
-          <acceleration>0.070945 -0.558619 0.512434 -0.205362 1.17227 2.93851</acceleration>
-          <wrench>0.000709 -0.005586 0.005124 0 -0 0</wrench>
+          <pose frame=''>5.93121 -2.05579 -0.015015 -1.56985 -0.079816 1.57742</pose>
+          <velocity>0.000751 -0.000157 -0.000811 -0.000677 0.007812 -0.00171</velocity>
+          <acceleration>-0.110759 0.235135 1.97634 1.85353 -0.534956 0.404889</acceleration>
+          <wrench>-0.001108 0.002351 0.019763 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='slow'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='body'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='stop'>
+        <pose frame=''>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='body'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <light name='sun'>
@@ -1240,7 +1381,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>12.5511 -21.34 31.0456 0 0.9018 1.7242</pose>
+        <pose frame=''>5.46645 -8.05697 10.8738 0 0.9018 1.7242</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
