@@ -31,15 +31,15 @@ cv::Mat projectImage(const cv::Mat &image)
     cv::Point2f source_points[4];
     cv::Point2f dest_points[4];
 
-    source_points[0] = cv::Point2f(50, 420);
-    source_points[1] = cv::Point2f(135, 350);
-    source_points[2] = cv::Point2f(490, 350);
-    source_points[3] = cv::Point2f(575, 420);
+    source_points[0] = cv::Point2f(0, 600);
+    source_points[1] = cv::Point2f(232, 425);
+    source_points[2] = cv::Point2f(557, 425);
+    source_points[3] = cv::Point2f(800, 600);
 
-    dest_points[0] = cv::Point2f(0, 480);
-    dest_points[1] = cv::Point2f(0, 245);
-    dest_points[2] = cv::Point2f(640, 245);
-    dest_points[3] = cv::Point2f(640, 480);
+    dest_points[0] = cv::Point2f(0, 600);
+    dest_points[1] = cv::Point2f(0, 0);
+    dest_points[2] = cv::Point2f(800, 0);
+    dest_points[3] = cv::Point2f(800, 600);
 
     cv::Mat dst;
     cv::Mat transformMatrix = cv::getPerspectiveTransform(source_points, dest_points);
@@ -62,8 +62,8 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
         cv::Canny(blurredImage, lineImage, 100, 150, 5, true);
         cv::Mat maskedImage = maskImage(cameraImage);
 
-        cv::Mat projectedImage = projectImage(cameraImage);
-        cv::imshow("view", cameraImage);
+        cv::Mat projectedImage = projectImage(blurredImage);
+        cv::imshow("view", projectedImage);
         cv::waitKey(30);
     }
 
