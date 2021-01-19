@@ -4,7 +4,29 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
+#include "polynomial_fit.h"
 
+/**
+ * Sum numbers in a vector.
+ *
+ * This sum is the arithmetic sum, not some other kind of sum that only
+ * mathematicians have heard of.
+ *
+ * @param binaryImage Binary image on which histogram poeration will be applied.
+ * @param histogramSize The number of bins to which the X axis is partitioned.
+ * @return Two lowermost rectangles containing the lane points
+ */
+std::pair<cv::Rect, cv::Rect> getLowermostLaneRegions(cv::Mat binaryImage, int histogramSize)
+{
+}
+
+/**
+ * Get the relevant lane points from the image using the Sliding Window method.
+ *
+ * @param image Image the points of which will be filtered and transformed.
+ * @param window The rectangle indicating the starting window.
+ * @return A vector collection of points which were extracted starting from the initial window
+ */
 std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
 {
     std::vector<cv::Point2f> gatheredPoints;
