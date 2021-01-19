@@ -5,6 +5,59 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 
+std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
+{
+    std::vector<cv::Point2f> gatheredPoints;
+    const cv::Size imageSize = image.size();
+    bool reachedUpperBoundary = false;
+
+    while (true)
+    {
+        float currentX = window.x + window.width * 0.5f;
+
+        cv::Mat subRegion = image(window); //Extract region of interest
+        std::vector<cv::Point2f> detectedLanePoints;
+
+        cv::findNonZero(subRegion, detectedLanePoints); //Get all non-black pixels. All are white in our case
+        float sumOfXCoordinates = 0.0f;
+
+        for (int i = 0; i < detectedLanePoints.size(); ++i) //Calculate average X position
+        {
+            float x = detectedLanePoints[i].x;
+            sumOfXCoordinates += window.x + x;
+        }
+
+        float averageXCoordinate = detectedLanePoints.empty() ? currentX : sumOfXCoordinates / detectedLanePoints.size();
+
+        cv::Point point(averageXCoordinate, window.y + window.height * 0.5f);
+        gatheredPoints.push_back(point);
+
+        //Move the window up
+        window.y -= window.height;
+
+        //For the uppermost position
+        if (window.y < 0)
+        {
+            window.y = 0;
+            reachedUpperBoundary = true;
+        }
+
+        //Move x position
+        window.x += (point.x - currentX);
+
+        //Make sure the window doesn't overflow, we get an error if we try to get data outside the matrix
+        if (window.x < 0)
+            window.x = 0;
+        if (window.x + window.width >= imageSize.width)
+            window.x = imageSize.width - window.width - 1;
+
+        if (reachedUpperBoundary)
+            break;
+    }
+
+    return gatheredPoints;
+}
+
 cv::Mat maskImage(cv::Mat image)
 {
     cv::Mat maskedImage;
@@ -39,6 +92,7 @@ cv::Mat projectImage(const cv::Mat &image)
     dest_points[0] = cv::Point2f(0, 600);
     dest_points[1] = cv::Point2f(0, 0);
     dest_points[2] = cv::Point2f(800, 0);
+
     dest_points[3] = cv::Point2f(800, 600);
 
     cv::Mat dst;
@@ -60,9 +114,8 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
         cv::GaussianBlur(grayImageMatrix, blurredImage, cv::Size(5, 5), 1);
         cv::Mat lineImage;
         cv::Canny(blurredImage, lineImage, 100, 150, 5, true);
-        cv::Mat maskedImage = maskImage(cameraImage);
-
-        cv::Mat projectedImage = projectImage(blurredImage);
+        cv::Mat maskedImage = maskImage(lineImage);
+        cv::Mat projectedImage = projectImage(lineImage);
         cv::imshow("view", projectedImage);
         cv::waitKey(30);
     }
