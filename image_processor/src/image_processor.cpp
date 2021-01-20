@@ -6,6 +6,8 @@
 #include <math.h>
 #include "polynomial_fit.h"
 
+
+
 /**
  * Find the number of nonblack pixels in each X Partition and return them in an array
  *
@@ -228,6 +230,47 @@ cv::Mat projectImage(const cv::Mat &image)
 
     return dst;
 }
+
+
+/**
+ * Get the distance to the center of the two lanes (Error Signal)
+ *
+ * @param rawImage The raw image with visible lane markers.
+ * @return The distance (error) in length units
+ */
+
+float calculateDistanceToLaneCenter(cv::Mat rawImage)
+{
+
+    cv::Mat grayImageMatrix;
+    cv::cvtColor(rawImage, grayImageMatrix, cv::COLOR_BGR2GRAY);
+    cv::Mat blurredImage;
+    cv::GaussianBlur(grayImageMatrix, blurredImage, cv::Size(5, 5), 1);
+    cv::Mat lineImage;
+    cv::Canny(blurredImage, lineImage, 100, 150, 5, true);
+    cv::Mat maskedImage = maskImage(lineImage);
+    cv::Mat projectedImage = projectImage(lineImage);
+
+    //Count of lane points after diving the image into vertical bins
+    //std::vector<int> histogram = getPointDistribution(projectedImage, 10, 10);
+
+    //
+    //cv::Mat visualHistogram = getVisualisedHistogram(histogram, 10);
+
+    std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 5, 8);
+
+    std::vector<cv::Point2f> firstCurvePointCluster = slidingWindowMethod(projectedImage, rectRegions.first);
+    std::vector<cv::Point2f> secondCurvePointCluster = slidingWindowMethod(projectedImage, rectRegions.second);
+
+    // Curve fit for both
+
+    //Find x intersection
+
+    //Return (xIntersectionFirst+XıntersectionSecond/2 )-(rawImage.size().width/2)
+}
+
+
+
 
 void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
 {
