@@ -146,7 +146,7 @@
         <collision name='ground_coll'>
           <geometry>
             <box>
-              <size>12 21.3 0.1</size>
+              <size>7 13.02 0.1</size>
             </box>
           </geometry>
           <surface>
@@ -166,7 +166,7 @@
         <visual name='ground_vis'>
           <geometry>
             <box>
-              <size>12 21.3 0.1</size>
+              <size>7 13.02 0.1</size>
             </box>
           </geometry>
           <material>
@@ -1309,10 +1309,10 @@
       <pose frame=''>0 0 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>300 462000000</sim_time>
-      <real_time>26 962682663</real_time>
-      <wall_time>1610898651 222683891</wall_time>
-      <iterations>26762</iterations>
+      <sim_time>393 177000000</sim_time>
+      <real_time>38 147152458</real_time>
+      <wall_time>1611170691 573936168</wall_time>
+      <iterations>38007</iterations>
       <model name='forward'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <scale>1 1 1</scale>
@@ -1334,25 +1334,25 @@
         </link>
       </model>
       <model name='mobile_base'>
-        <pose frame=''>5.81617 -2.05606 -0.050243 0.000944 -0.014436 1.57748</pose>
+        <pose frame=''>1.49835 -0.903893 -0.050245 0.000889 -0.01443 1.50533</pose>
         <scale>1 1 1</scale>
         <link name='base_footprint'>
-          <pose frame=''>5.81617 -2.05606 -0.050243 0.000944 -0.014436 1.57748</pose>
-          <velocity>0.000477 1.6e-05 8.8e-05 -0.000677 0.007812 -0.00171</velocity>
-          <acceleration>0.225781 0.048509 -0.065165 1.89518 -1.32897 1.0301</acceleration>
-          <wrench>1.11114 0.238729 -0.320695 0 -0 0</wrench>
+          <pose frame=''>1.49835 -0.903893 -0.050245 0.000889 -0.01443 1.50533</pose>
+          <velocity>0.00037 -0.00058 0.000102 -0.005789 -0.007015 0.002035</velocity>
+          <acceleration>-0.290345 0.093975 -0.006956 1.08824 1.34631 -0.427282</acceleration>
+          <wrench>-1.42887 0.46248 -0.034234 0 -0 0</wrench>
         </link>
         <link name='wheel_left_link'>
-          <pose frame=''>5.70124 -2.05734 -0.014796 -1.56987 0.053604 1.57755</pose>
-          <velocity>0.00075 0.000237 0.000987 -0.000677 0.007812 -0.00171</velocity>
-          <acceleration>-0.16113 0.044923 -0.121841 -3.0665 -1.1216 -2.75994</acceleration>
-          <wrench>-0.001611 0.000449 -0.001218 0 -0 0</wrench>
+          <pose frame=''>1.3836 -0.89688 -0.014817 -1.56991 0.069264 1.50541</pose>
+          <velocity>0.000108 -0.000609 -0.000743 -0.005789 -0.007015 0.002035</velocity>
+          <acceleration>-0.756417 0.743759 1.78854 0.757486 1.47716 2.80223</acceleration>
+          <wrench>-0.007564 0.007438 0.017885 0 -0 0</wrench>
         </link>
         <link name='wheel_right_link'>
-          <pose frame=''>5.93121 -2.05579 -0.015015 -1.56985 -0.079816 1.57742</pose>
-          <velocity>0.000751 -0.000157 -0.000811 -0.000677 0.007812 -0.00171</velocity>
-          <acceleration>-0.110759 0.235135 1.97634 1.85353 -0.534956 0.404889</acceleration>
-          <wrench>-0.001108 0.002351 0.019763 0 -0 0</wrench>
+          <pose frame=''>1.61308 -0.911923 -0.015002 -1.5699 -0.103579 1.50525</pose>
+          <velocity>0.00014 -0.000143 0.000954 -0.005789 -0.007015 0.002035</velocity>
+          <acceleration>-0.828599 0.428959 -0.17613 -2.97583 0.626042 -0.342485</acceleration>
+          <wrench>-0.008286 0.00429 -0.001761 0 -0 0</wrench>
         </link>
       </model>
       <model name='slow'>
@@ -1381,7 +1381,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>5.46645 -8.05697 10.8738 0 0.9018 1.7242</pose>
+        <pose frame=''>2.79854 -4.9732 6.30962 -0 0.725796 1.7162</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>

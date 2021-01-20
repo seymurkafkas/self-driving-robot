@@ -272,7 +272,7 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     //
     //cv::Mat visualHistogram = getVisualisedHistogram(histogram, 10);
 
-    std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 5, 8);
+    std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 4, 6);
 
     std::vector<cv::Point2f> firstCurvePointCluster = slidingWindowMethod(projectedImage, rectRegions.first);
     std::vector<cv::Point2f> secondCurvePointCluster = slidingWindowMethod(projectedImage, rectRegions.second);
@@ -284,6 +284,11 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
 
     leastSquareSum.fitIt(firstCurvePointCluster, 2, coefficientsForLeftQuadratic);
     leastSquareSum.fitIt(secondCurvePointCluster, 2, coefficientsForRightQuadratic);
+
+    cv::rectangle(projectedImage, rectRegions.first, cv::Scalar(255, 0, 0));
+    cv::rectangle(projectedImage, rectRegions.second, cv::Scalar(255, 0, 0));
+
+    cv::imshow("projection", projectedImage);
 
     /*     std::cout << "a: " << coefficientsForLeftQuadratic[0] << "  b: " << coefficientsForLeftQuadratic[1] << "   c: " << coefficientsForLeftQuadratic[2] << std::endl;
     std::cout << "2nd ONE: " << std::endl;
@@ -317,17 +322,15 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
         std::vector<int> histogram = getPointDistribution(projectedImage, 10, 10);
         cv::Mat visualHistogram = getVisualisedHistogram(histogram, 10);
 
-        std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 5, 8);
+        std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 4, 8);
 
-        // cv::rectangle(projectedImage, rectRegions.first, cv::Scalar(255, 0, 0));
-        // cv::rectangle(projectedImage, rectRegions.second, cv::Scalar(255, 0, 0));
         // std::vector< cv::Point2f > gatherPoints= slidingWindowMethod(projectedImage,cv::Rect(cv::Point(55,150),cv::Point(65,160)));
         float errorSignal = calculateDistanceToLaneCenter(cameraImage);
 
-        motor_command.linear.x = 0.3;
-        motor_command.angular.z = -errorSignal*0.002;
+        motor_command.linear.x = 0.55;
+        motor_command.angular.z = -errorSignal * 0.004;
         motor_command_publisher.publish(motor_command);
-        cv::imshow("view", projectedImage);
+        //  cv::imshow("view", projectedImage);
         cv::waitKey(30);
     }
 
