@@ -53,8 +53,58 @@ std::pair<cv::Rect, cv::Rect> getLowermostLaneRegions(cv::Mat binaryImage, int h
 
     std::vector<int> lanePointDistributionVector = getPointDistribution(binaryImage, histogramSize, verticalSize);
 
+    int maxNumberOfPoints, secondMaxNumberOfPoints, maxIndex, secondMaxIndex;
 
+    if (std::max(lanePointDistributionVector[0], lanePointDistributionVector[1]) == lanePointDistributionVector[0])
+    {
 
+        maxIndex = 0;
+        secondMaxIndex = 1;
+        maxNumberOfPoints = lanePointDistributionVector[0];
+        secondMaxNumberOfPoints = lanePointDistributionVector[1];
+    }
+    else
+    {
+
+        maxIndex = 1;
+        secondMaxIndex = 0;
+        maxNumberOfPoints = lanePointDistributionVector[1];
+        secondMaxNumberOfPoints = lanePointDistributionVector[0];
+    }
+
+    for (int i = 2; i < lanePointDistributionVector.size(); i++)
+    {
+        std::cout << "Current: " << lanePointDistributionVector[i] << std::endl;
+        std::cout << "maxIndex: " << maxIndex << std::endl;
+        std::cout << "Second max index: " << secondMaxIndex << std::endl;
+
+        if (maxNumberOfPoints <= lanePointDistributionVector[i])
+        {
+            secondMaxNumberOfPoints = maxNumberOfPoints;
+            maxNumberOfPoints = lanePointDistributionVector[i];
+            secondMaxIndex = maxIndex;
+            maxIndex = i;
+        }
+        else if (secondMaxNumberOfPoints < lanePointDistributionVector[i])
+        {
+            secondMaxNumberOfPoints = lanePointDistributionVector[i];
+            secondMaxIndex = i;
+        }
+    }
+
+    int yTopLeftPoint = imageSize.height - rectangleHeight;
+    int xTopLeftPoint = maxIndex * (rectangleWidth);
+    int yBottomRightPoint = imageSize.height;
+    int xBottomRightPoint = (maxIndex + 1) * (rectangleWidth);
+    cv::Rect firstRectangle(cv::Point(xTopLeftPoint, yTopLeftPoint), cv::Point(xBottomRightPoint, yBottomRightPoint));
+
+    yTopLeftPoint = imageSize.height - rectangleHeight;
+    xTopLeftPoint = secondMaxIndex * (rectangleWidth);
+    yBottomRightPoint = imageSize.height;
+    xBottomRightPoint = (secondMaxIndex + 1) * (rectangleWidth);
+    cv::Rect secondRectangle(cv::Point(xTopLeftPoint, yTopLeftPoint), cv::Point(xBottomRightPoint, yBottomRightPoint));
+
+    return std::make_pair(firstRectangle, secondRectangle);
 }
 
 cv::Mat getVisualisedHistogram(std::vector<int> histogram, int histogramSize)
@@ -194,9 +244,14 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
         cv::Mat maskedImage = maskImage(lineImage);
         cv::Mat projectedImage = projectImage(lineImage);
 
-        std::vector<int> histogram = getPointDistribution(lineImage, 200, 10);
-        cv::Mat visualHistogram = getVisualisedHistogram(histogram, 200);
-        cv::imshow("view", visualHistogram);
+        std::vector<int> histogram = getPointDistribution(projectedImage, 10, 10);
+        cv::Mat visualHistogram = getVisualisedHistogram(histogram, 10);
+
+        std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 5, 8);
+
+        cv::rectangle(projectedImage, rectRegions.first, cv::Scalar(255, 0, 0));
+        cv::rectangle(projectedImage, rectRegions.second, cv::Scalar(255, 0, 0));
+        cv::imshow("view", projectedImage);
         cv::waitKey(30);
     }
 
@@ -211,6 +266,14 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "image_processor");
     ros::NodeHandle nh;
     cv::namedWindow("Turtlebot");
+    PolynomialRegression<float> leastSquareSum;
+    std::vector<cv::Point> testPoints;
+    testPoints.push_back(cv::Point(10, 250));
+    testPoints.push_back(cv::Point(50, 5250));
+    testPoints.push_back(cv::Point(80, 13200));
+    std::vector<float> coefficients;
+    leastSquareSum.fitIt(testPoints, 2, coefficients);
+    std::cout << "a: " << coefficients[0] << "  b: " << coefficients[1] << "   c: " << coefficients[2] << std::endl;
     image_transport::ImageTransport it(nh);
     image_transport::Subscriber sub = it.subscribe("camera/rgb/image_raw", 1, rawImageCallback);
     ros::spin();
