@@ -5,6 +5,10 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
 #include "polynomial_fit.h"
+#include "geometry_msgs/Twist.h"
+
+geometry_msgs::Twist motor_command;
+ros::Publisher motor_command_publisher;
 
 /**
  * Find the number of nonblack pixels in each X Partition and return them in an array
@@ -317,9 +321,12 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
 
         // cv::rectangle(projectedImage, rectRegions.first, cv::Scalar(255, 0, 0));
         // cv::rectangle(projectedImage, rectRegions.second, cv::Scalar(255, 0, 0));
-
         // std::vector< cv::Point2f > gatherPoints= slidingWindowMethod(projectedImage,cv::Rect(cv::Point(55,150),cv::Point(65,160)));
-        calculateDistanceToLaneCenter(cameraImage);
+        float errorSignal = calculateDistanceToLaneCenter(cameraImage);
+
+        motor_command.linear.x = 0.3;
+        motor_command.angular.z = -errorSignal*0.002;
+        motor_command_publisher.publish(motor_command);
         cv::imshow("view", projectedImage);
         cv::waitKey(30);
     }
@@ -335,6 +342,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "image_processor");
     ros::NodeHandle nh;
     cv::namedWindow("Turtlebot");
+    motor_command_publisher = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/navi", 100);
     /*     PolynomialRegression<float> leastSquareSum;
     std::vector<cv::Point2f> testPoints;
     testPoints.push_back(cv::Point2f(250, 10));
