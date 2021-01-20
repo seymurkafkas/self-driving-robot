@@ -6,8 +6,6 @@
 #include <math.h>
 #include "polynomial_fit.h"
 
-
-
 /**
  * Find the number of nonblack pixels in each X Partition and return them in an array
  *
@@ -27,12 +25,12 @@ std::vector<int> getPointDistribution(cv::Mat binaryImage, int histogramSize, in
     cv::Mat histogram;
     cv::Point bottomRightPoint(rectangleWidth, imageSize.height);
     cv::Rect verticalBin(topLeftPoint, bottomRightPoint);
-    std::cout << "------------------------------" << std::endl;
+    //   std::cout << "------------------------------" << std::endl;
     for (int i = 0; i < histogramSize; i++)
     {
         int currentPointCount = cv::countNonZero(binaryImage(verticalBin));
         pointDistributionAcrossX.push_back(currentPointCount);
-        std::cout << currentPointCount << std::endl;
+        //      std::cout << currentPointCount << std::endl;
         verticalBin.x += rectangleWidth;
     }
 
@@ -76,9 +74,9 @@ std::pair<cv::Rect, cv::Rect> getLowermostLaneRegions(cv::Mat binaryImage, int h
 
     for (int i = 2; i < lanePointDistributionVector.size(); i++)
     {
-        std::cout << "Current: " << lanePointDistributionVector[i] << std::endl;
-        std::cout << "maxIndex: " << maxIndex << std::endl;
-        std::cout << "Second max index: " << secondMaxIndex << std::endl;
+        //      std::cout << "Current: " << lanePointDistributionVector[i] << std::endl;
+        //     std::cout << "maxIndex: " << maxIndex << std::endl;
+        //     std::cout << "Second max index: " << secondMaxIndex << std::endl;
 
         if (maxNumberOfPoints <= lanePointDistributionVector[i])
         {
@@ -118,7 +116,7 @@ cv::Mat getVisualisedHistogram(std::vector<int> histogram, int histogramSize)
     float maximumPointCount = *std::max_element(histogram.begin(), histogram.end());
     for (int i = 1; i < histogramSize; i++)
     {
-        std::cout << "At index " << i << ": " << cvRound(histogram.at(i - 1)) << std::endl;
+        //      std::cout << "At index " << i << ": " << cvRound(histogram.at(i - 1)) << std::endl;
         cv::line(histImage, cv::Point(bin_w * (i - 1), hist_h - cvRound(histogram.at(i - 1)) * hist_h / maximumPointCount),
                  cv::Point(bin_w * (i), hist_h - cvRound(histogram.at(i)) * hist_h / maximumPointCount),
                  cv::Scalar(255, 0, 0), 2, 8, 0);
@@ -145,7 +143,7 @@ std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
         float currentX = window.x + window.width * 0.5f;
 
         cv::Mat subRegion = image(window); //Extract region of interest
-        std::vector<cv::Point2f> detectedLanePoints;
+        std::vector<cv::Point> detectedLanePoints;
 
         cv::findNonZero(subRegion, detectedLanePoints); //Get all non-black pixels. All are white in our case
         float sumOfXCoordinates = 0.0f;
@@ -231,6 +229,19 @@ cv::Mat projectImage(const cv::Mat &image)
     return dst;
 }
 
+float calculateXIntercept(cv::Size imageSize, const std::vector<float> &polynomialCoefficients)
+{
+
+    float c = polynomialCoefficients[0];
+    float b = polynomialCoefficients[1];
+    float a = polynomialCoefficients[2];
+
+    float y = imageSize.height;
+
+    float xAtIntercept = (a * y * y + b * y + c);
+
+    return xAtIntercept;
+}
 
 /**
  * Get the distance to the center of the two lanes (Error Signal)
@@ -264,13 +275,25 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
 
     // Curve fit for both
 
-    //Find x intersection
+    PolynomialRegression<float> leastSquareSum;
+    std::vector<float> coefficientsForLeftQuadratic, coefficientsForRightQuadratic;
 
+    leastSquareSum.fitIt(firstCurvePointCluster, 2, coefficientsForLeftQuadratic);
+    leastSquareSum.fitIt(secondCurvePointCluster, 2, coefficientsForRightQuadratic);
+
+    /*     std::cout << "a: " << coefficientsForLeftQuadratic[0] << "  b: " << coefficientsForLeftQuadratic[1] << "   c: " << coefficientsForLeftQuadratic[2] << std::endl;
+    std::cout << "2nd ONE: " << std::endl;
+    std::cout << "a: " << coefficientsForRightQuadratic[0] << "  b: " << coefficientsForRightQuadratic[1] << "   c: " << coefficientsForRightQuadratic[2] << std::endl; */
+
+    float firstXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForLeftQuadratic);
+    float secondXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForRightQuadratic);
+
+    float error = ((firstXIntercept + secondXIntercept) / 2) - (projectedImage.size().width / 2);
+    //Find x intersection
+    std::cout << "Error :" << error << std::endl;
+    return error;
     //Return (xIntersectionFirst+XıntersectionSecond/2 )-(rawImage.size().width/2)
 }
-
-
-
 
 void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
 {
@@ -292,8 +315,11 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
 
         std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 5, 8);
 
-        cv::rectangle(projectedImage, rectRegions.first, cv::Scalar(255, 0, 0));
-        cv::rectangle(projectedImage, rectRegions.second, cv::Scalar(255, 0, 0));
+        // cv::rectangle(projectedImage, rectRegions.first, cv::Scalar(255, 0, 0));
+        // cv::rectangle(projectedImage, rectRegions.second, cv::Scalar(255, 0, 0));
+
+        // std::vector< cv::Point2f > gatherPoints= slidingWindowMethod(projectedImage,cv::Rect(cv::Point(55,150),cv::Point(65,160)));
+        calculateDistanceToLaneCenter(cameraImage);
         cv::imshow("view", projectedImage);
         cv::waitKey(30);
     }
@@ -309,14 +335,14 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "image_processor");
     ros::NodeHandle nh;
     cv::namedWindow("Turtlebot");
-    PolynomialRegression<float> leastSquareSum;
-    std::vector<cv::Point> testPoints;
-    testPoints.push_back(cv::Point(10, 250));
-    testPoints.push_back(cv::Point(50, 5250));
-    testPoints.push_back(cv::Point(80, 13200));
+    /*     PolynomialRegression<float> leastSquareSum;
+    std::vector<cv::Point2f> testPoints;
+    testPoints.push_back(cv::Point2f(250, 10));
+    testPoints.push_back(cv::Point2f(5250, 50));
+    testPoints.push_back(cv::Point2f(13200, 80));
     std::vector<float> coefficients;
     leastSquareSum.fitIt(testPoints, 2, coefficients);
-    std::cout << "a: " << coefficients[0] << "  b: " << coefficients[1] << "   c: " << coefficients[2] << std::endl;
+    std::cout << "a: " << coefficients[0] << "  b: " << coefficients[1] << "   c: " << coefficients[2] << std::endl; */
     image_transport::ImageTransport it(nh);
     image_transport::Subscriber sub = it.subscribe("camera/rgb/image_raw", 1, rawImageCallback);
     ros::spin();

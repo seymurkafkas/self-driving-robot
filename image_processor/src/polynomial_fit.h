@@ -51,7 +51,7 @@ public:
     virtual ~PolynomialRegression(){};
 
     bool fitIt(
-        const std::vector<cv::Point> &Points,
+        const std::vector<cv::Point2f> &Points,
         const int &order,
         std::vector<TYPE> &coeffs);
 };
@@ -61,7 +61,7 @@ PolynomialRegression<TYPE>::PolynomialRegression(){};
 
 template <class TYPE>
 bool PolynomialRegression<TYPE>::fitIt(
-    const std::vector<cv::Point> &Points,
+    const std::vector<cv::Point2f> &Points,
     const int &order,
     std::vector<TYPE> &coeffs)
 {    // The size of xValues and yValues should be same
@@ -86,7 +86,7 @@ bool PolynomialRegression<TYPE>::fitIt(
     {
         X[i] = 0;
         for (int j = 0; j < N; ++j)
-            X[i] += (TYPE)pow(Points[j].x, i);
+            X[i] += (TYPE)pow(Points[j].y, i);
     }
 
     // a = vector to store final coefficients.
@@ -106,7 +106,7 @@ bool PolynomialRegression<TYPE>::fitIt(
         Y[i] = (TYPE)0;
         for (int j = 0; j < N; ++j)
         {
-            Y[i] += (TYPE)pow(Points[j].x, i) * Points[j].y;
+            Y[i] += (TYPE)pow(Points[j].y, i) * Points[j].x;
         }
     }
 
