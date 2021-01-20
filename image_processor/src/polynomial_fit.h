@@ -51,8 +51,7 @@ public:
     virtual ~PolynomialRegression(){};
 
     bool fitIt(
-        const std::vector<TYPE> &x,
-        const std::vector<TYPE> &y,
+        const std::vector<cv::Point> &Points,
         const int &order,
         std::vector<TYPE> &coeffs);
 };
@@ -62,25 +61,19 @@ PolynomialRegression<TYPE>::PolynomialRegression(){};
 
 template <class TYPE>
 bool PolynomialRegression<TYPE>::fitIt(
-    const std::vector<TYPE> &x,
-    const std::vector<TYPE> &y,
+    const std::vector<cv::Point> &Points,
     const int &order,
     std::vector<TYPE> &coeffs)
-{
-    // The size of xValues and yValues should be same
-    if (x.size() != y.size())
-    {
-        throw std::runtime_error("The size of x & y arrays are different");
-        return false;
-    }
+{    // The size of xValues and yValues should be same
+  
     // The size of xValues and yValues cannot be 0, should not happen
-    if (x.size() == 0 || y.size() == 0)
+    if (Points.size() == 0)
     {
         throw std::runtime_error("The size of x or y arrays is 0");
         return false;
     }
 
-    size_t N = x.size();
+    size_t N = Points.size();
     int n = order;
     int np1 = n + 1;
     int np2 = n + 2;
@@ -93,7 +86,7 @@ bool PolynomialRegression<TYPE>::fitIt(
     {
         X[i] = 0;
         for (int j = 0; j < N; ++j)
-            X[i] += (TYPE)pow(x[j], i);
+            X[i] += (TYPE)pow(Points[j].x, i);
     }
 
     // a = vector to store final coefficients.
@@ -113,7 +106,7 @@ bool PolynomialRegression<TYPE>::fitIt(
         Y[i] = (TYPE)0;
         for (int j = 0; j < N; ++j)
         {
-            Y[i] += (TYPE)pow(x[j], i) * y[j];
+            Y[i] += (TYPE)pow(Points[j].x, i) * Points[j].y;
         }
     }
 
