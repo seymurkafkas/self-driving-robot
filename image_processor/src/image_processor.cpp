@@ -7,17 +7,71 @@
 #include "polynomial_fit.h"
 
 /**
- * Sum numbers in a vector.
+ * Find the number of nonblack pixels in each X Partition and return them in an array
  *
- * This sum is the arithmetic sum, not some other kind of sum that only
- * mathematicians have heard of.
+ * @param binaryImage Binary image which will be partitioned
+ * @param histogramSize The number of bins to which the X axis is partitioned.
+ * @return A vector of counted points at every given bin
+ */
+
+std::vector<int> getPointDistribution(cv::Mat binaryImage, int histogramSize, int verticalSize)
+{
+
+    cv::Size imageSize = binaryImage.size();
+    int rectangleHeight = imageSize.height / verticalSize;
+    int rectangleWidth = imageSize.width / histogramSize;
+    std::vector<int> pointDistributionAcrossX;
+    cv::Point topLeftPoint(0, 0);
+    cv::Mat histogram;
+    cv::Point bottomRightPoint(rectangleWidth, imageSize.height);
+    cv::Rect verticalBin(topLeftPoint, bottomRightPoint);
+    std::cout << "------------------------------" << std::endl;
+    for (int i = 0; i < histogramSize; i++)
+    {
+        int currentPointCount = cv::countNonZero(binaryImage(verticalBin));
+        pointDistributionAcrossX.push_back(currentPointCount);
+        std::cout << currentPointCount << std::endl;
+        verticalBin.x += rectangleWidth;
+    }
+
+    return pointDistributionAcrossX;
+}
+
+/**
+ * Find the lowermost lane windows, to be used in the Sliding Window Method
  *
  * @param binaryImage Binary image on which histogram poeration will be applied.
  * @param histogramSize The number of bins to which the X axis is partitioned.
  * @return Two lowermost rectangles containing the lane points
  */
-std::pair<cv::Rect, cv::Rect> getLowermostLaneRegions(cv::Mat binaryImage, int histogramSize)
+std::pair<cv::Rect, cv::Rect> getLowermostLaneRegions(cv::Mat binaryImage, int histogramSize, int verticalSize)
 {
+
+    cv::Size imageSize = binaryImage.size();
+    int rectangleHeight = imageSize.height / verticalSize;
+    int rectangleWidth = imageSize.width / histogramSize;
+
+    std::vector<int> lanePointDistributionVector = getPointDistribution(binaryImage, histogramSize, verticalSize);
+
+
+
+}
+
+cv::Mat getVisualisedHistogram(std::vector<int> histogram, int histogramSize)
+{
+    int hist_w = 512, hist_h = 400;
+    int bin_w = cvRound((double)hist_w / histogramSize);
+    cv::Mat histImage(hist_h, hist_w, CV_8UC3, cv::Scalar(0, 0, 0));
+
+    float maximumPointCount = *std::max_element(histogram.begin(), histogram.end());
+    for (int i = 1; i < histogramSize; i++)
+    {
+        std::cout << "At index " << i << ": " << cvRound(histogram.at(i - 1)) << std::endl;
+        cv::line(histImage, cv::Point(bin_w * (i - 1), hist_h - cvRound(histogram.at(i - 1)) * hist_h / maximumPointCount),
+                 cv::Point(bin_w * (i), hist_h - cvRound(histogram.at(i)) * hist_h / maximumPointCount),
+                 cv::Scalar(255, 0, 0), 2, 8, 0);
+    }
+    return histImage;
 }
 
 /**
@@ -27,6 +81,7 @@ std::pair<cv::Rect, cv::Rect> getLowermostLaneRegions(cv::Mat binaryImage, int h
  * @param window The rectangle indicating the starting window.
  * @return A vector collection of points which were extracted starting from the initial window
  */
+
 std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
 {
     std::vector<cv::Point2f> gatheredPoints;
@@ -138,7 +193,10 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
         cv::Canny(blurredImage, lineImage, 100, 150, 5, true);
         cv::Mat maskedImage = maskImage(lineImage);
         cv::Mat projectedImage = projectImage(lineImage);
-        cv::imshow("view", projectedImage);
+
+        std::vector<int> histogram = getPointDistribution(lineImage, 200, 10);
+        cv::Mat visualHistogram = getVisualisedHistogram(histogram, 200);
+        cv::imshow("view", visualHistogram);
         cv::waitKey(30);
     }
 
