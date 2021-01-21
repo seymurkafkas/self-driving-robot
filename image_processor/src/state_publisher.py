@@ -9,12 +9,10 @@ from std_msgs.msg import Int32
 
 
 def image_callback(rawImage):
-    print("callback executed")
     camera_image = CvBridge().imgmsg_to_cv2(rawImage, "bgr8")
     #cv2.Rect myROI(0, 0, 800, 300);
     crop_img = camera_image[0:300, 0:800]
-    cv2.imshow("ahmet",crop_img)
-    cv2.waitKey(0)
+    #cv2.imshow("ahmet",crop_img)
 
     lower_blue = np.array([90,80,50])
     upper_blue = np.array([110,255,255])
@@ -61,25 +59,28 @@ def image_callback(rawImage):
             if area > largestArea:
                 largestArea = area
                 largestRect = box
-        
+    state=0  
+
+    if(largestRect == None):
+        state_publisher.publish(state)
+        return
+
     if largestArea > frame_area*0.02:
         print(largestRect)
         # draw contour of the found rectangle on  the original image   
         cv2.drawContours(crop_img,[largestRect],0,(0,0,255),2)
-        
+
         # cut and warp interesting area
         #warped = four_point_transform(mask, [largestRect][0])
     
-    cv2.imshow("dayi", crop_img)
-    cv2.waitKey(0)
+    #cv2.imshow("dayi", crop_img)
 
     pts1=np.float32(largestRect)
     pts2=np.float32([[150,150], [0,150], [0,0], [150,0]])
 
     matrix=cv2.getPerspectiveTransform(pts1, pts2)
     result=cv2.warpPerspective(crop_img, matrix, (150,150))
-    cv2.imshow("warp", result)
-    cv2.waitKey(0)
+    #cv2.imshow("warp", result)
 
     black_mask=np.full((150, 150), 255, dtype=int)
 
@@ -87,13 +88,11 @@ def image_callback(rawImage):
     black_max=np.array([10,10,10])
 
     mask2 = cv2.inRange(result, black_min, black_max)
-    cv2.imshow("black", mask2)
-    cv2.waitKey(0)
+    #cv2.imshow("black", mask2)
 
     black_mask = cv2.bitwise_not(mask2)
    # white_black=black_mask-mask2
-    cv2.imshow("white_black", black_mask)
-    cv2.waitKey(0)
+    #cv2.imshow("white_black", black_mask)
 
     #img=cv2.cvtColor(black_mask, cv2.COLOR_HSV2BGR)
 
@@ -101,11 +100,11 @@ def image_callback(rawImage):
     gray_img=cv2.blur(black_mask,(5,5))
     #canny = cv2.Canny(gray_img, 10, 20)   #100 200
     #ret, thresh = cv2.threshold(canny, 10, 20, 0)
-    
-    state=0
+
+   
 
     #img2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    corners= cv2.goodFeaturesToTrack(gray_img,15,0.01,40)
+    corners= cv2.goodFeaturesToTrack(gray_img,15,0.01,10)
     corners = np.array(corners)
     if(len(corners) != 0):
         #cnt = contours[0]
@@ -139,8 +138,6 @@ if __name__ == '__main__':
 
     #SUBSCRIBE TO CAMERA RAW
     #rospy.Subscriber("chatter", String, callback)
-
-    print("hello")
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
     

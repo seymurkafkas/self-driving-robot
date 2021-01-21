@@ -1309,67 +1309,67 @@
       <pose frame=''>0 0 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>393 177000000</sim_time>
-      <real_time>38 147152458</real_time>
-      <wall_time>1611170691 573936168</wall_time>
-      <iterations>38007</iterations>
+      <sim_time>544 110000000</sim_time>
+      <real_time>161 204827417</real_time>
+      <wall_time>1611264026 205057701</wall_time>
+      <iterations>150933</iterations>
       <model name='forward'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose frame=''>-1.44907 4.69323 0 0 0 -2.50543</pose>
         <scale>1 1 1</scale>
         <link name='body'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>-1.44907 4.69323 0 0 0 -2.50543</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='ground'>
-        <pose frame=''>1 2.3 -0.1 0 -0 0</pose>
+        <pose frame=''>0.998511 2.29082 -0.1 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='ground'>
-          <pose frame=''>1 2.3 -0.1 0 -0 0</pose>
+          <pose frame=''>0.998511 2.29082 -0.1 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='mobile_base'>
-        <pose frame=''>1.49835 -0.903893 -0.050245 0.000889 -0.01443 1.50533</pose>
+        <pose frame=''>2.10874 0.737277 -0.050246 0.00087 -0.014418 0.985846</pose>
         <scale>1 1 1</scale>
         <link name='base_footprint'>
-          <pose frame=''>1.49835 -0.903893 -0.050245 0.000889 -0.01443 1.50533</pose>
-          <velocity>0.00037 -0.00058 0.000102 -0.005789 -0.007015 0.002035</velocity>
-          <acceleration>-0.290345 0.093975 -0.006956 1.08824 1.34631 -0.427282</acceleration>
-          <wrench>-1.42887 0.46248 -0.034234 0 -0 0</wrench>
+          <pose frame=''>2.10874 0.737277 -0.050246 0.00087 -0.014418 0.985846</pose>
+          <velocity>-0.000263 0.001 0.000178 0.000106 -0.004515 0.000936</velocity>
+          <acceleration>-0.133307 0.041753 0.105195 1.14206 -0.697412 0.077058</acceleration>
+          <wrench>-0.656045 0.205479 0.517697 0 -0 0</wrench>
         </link>
         <link name='wheel_left_link'>
-          <pose frame=''>1.3836 -0.89688 -0.014817 -1.56991 0.069264 1.50541</pose>
-          <velocity>0.000108 -0.000609 -0.000743 -0.005789 -0.007015 0.002035</velocity>
-          <acceleration>-0.756417 0.743759 1.78854 0.757486 1.47716 2.80223</acceleration>
-          <wrench>-0.007564 0.007438 0.017885 0 -0 0</wrench>
+          <pose frame=''>2.0126 0.800331 -0.014814 -1.56992 0.105016 0.98595</pose>
+          <velocity>-0.000481 0.000907 -0.000249 0.000106 -0.004515 0.000936</velocity>
+          <acceleration>0.315689 -0.670303 1.30446 -0.805719 0.639966 -0.132949</acceleration>
+          <wrench>0.003157 -0.006703 0.013045 0 -0 0</wrench>
         </link>
         <link name='wheel_right_link'>
-          <pose frame=''>1.61308 -0.911923 -0.015002 -1.5699 -0.103579 1.50525</pose>
-          <velocity>0.00014 -0.000143 0.000954 -0.005789 -0.007015 0.002035</velocity>
-          <acceleration>-0.828599 0.428959 -0.17613 -2.97583 0.626042 -0.342485</acceleration>
-          <wrench>-0.008286 0.00429 -0.001761 0 -0 0</wrench>
+          <pose frame=''>2.20434 0.67335 -0.014998 -1.56992 -0.137027 0.985738</pose>
+          <velocity>-0.000362 0.001086 0.000603 0.000106 -0.004515 0.000936</velocity>
+          <acceleration>0.237747 -0.714666 0.488207 -2.43456 0.766799 2.97349</acceleration>
+          <wrench>0.002377 -0.007147 0.004882 0 -0 0</wrench>
         </link>
       </model>
       <model name='slow'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose frame=''>2.3319 -0.396035 0 0 -0 2.44698</pose>
         <scale>1 1 1</scale>
         <link name='body'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>2.3319 -0.396035 0 0 -0 2.44698</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='stop'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose frame=''>-0.000474 -3.79688 0 0 -0 0</pose>
         <scale>1 1 1</scale>
         <link name='body'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>-0.000474 -3.79688 0 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -1378,13 +1378,77 @@
       <light name='sun'>
         <pose frame=''>0 0 10 0 -0 0</pose>
       </light>
+      <light name='user_point_light_0'>
+        <pose frame=''>-2.26298 -4.11713 1 0 -0 0</pose>
+      </light>
+      <light name='user_point_light_1'>
+        <pose frame=''>4.35234 -4.11964 1 0 -0 0</pose>
+      </light>
+      <light name='user_point_light_2'>
+        <pose frame=''>-2.34731 8.40886 1 0 -0 0</pose>
+      </light>
+      <light name='user_point_light_3'>
+        <pose frame=''>4.33912 8.35156 1 0 -0 0</pose>
+      </light>
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>2.79854 -4.9732 6.30962 -0 0.725796 1.7162</pose>
+        <pose frame=''>-0.742597 -6.24581 5.18471 0 0.617797 1.4882</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
     </gui>
+    <light name='user_point_light_0' type='point'>
+      <pose frame=''>-2.26298 -4.11713 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
+    <light name='user_point_light_1' type='point'>
+      <pose frame=''>4.35234 -4.11964 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
+    <light name='user_point_light_2' type='point'>
+      <pose frame=''>-2.34731 8.40886 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
+    <light name='user_point_light_3' type='point'>
+      <pose frame=''>4.33912 8.35156 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
   </world>
 </sdf>
