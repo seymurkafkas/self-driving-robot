@@ -25,7 +25,7 @@ std::vector<int> getPointDistribution(cv::Mat binaryImage, int histogramSize, in
     int rectangleHeight = imageSize.height / verticalSize;
     int rectangleWidth = imageSize.width / histogramSize;
     std::vector<int> pointDistributionAcrossX;
-    cv::Point topLeftPoint(0, 0);
+    cv::Point topLeftPoint(0, imageSize.height-rectangleHeight);
     cv::Mat histogram;
     cv::Point bottomRightPoint(rectangleWidth, imageSize.height);
     cv::Rect verticalBin(topLeftPoint, bottomRightPoint);
