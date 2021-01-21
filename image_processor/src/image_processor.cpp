@@ -41,10 +41,6 @@ std::vector<int> getPointDistribution(cv::Mat binaryImage, int histogramSize, in
     return pointDistributionAcrossX;
 }
 
-
-
-
-
 /**
  * Find the bin indices for the most populated two bins in histogram.
  *
@@ -52,7 +48,7 @@ std::vector<int> getPointDistribution(cv::Mat binaryImage, int histogramSize, in
  * @return The pair of max and second max indices (maxIndex,secondMaxIndex)
  */
 
-std::pair<int,int> getTwoLocalPeaksOnHistogram(std::vector<int> lanePointDistributionVector)
+std::pair<int, int> getTwoLocalPeaksOnHistogram(std::vector<int> lanePointDistributionVector)
 {
     int maxNumberOfPoints, secondMaxNumberOfPoints, maxIndex, secondMaxIndex;
 
@@ -93,10 +89,8 @@ std::pair<int,int> getTwoLocalPeaksOnHistogram(std::vector<int> lanePointDistrib
         }
     }
 
-return std::make_pair(maxIndex,secondMaxIndex);
+    return std::make_pair(maxIndex, secondMaxIndex);
 }
-
-
 
 /**
  * Find the lowermost lane windows, to be used in the Sliding Window Method
@@ -114,9 +108,9 @@ std::pair<cv::Rect, cv::Rect> getLowermostLaneRegions(cv::Mat binaryImage, int h
 
     std::vector<int> lanePointDistributionVector = getPointDistribution(binaryImage, histogramSize, verticalSize);
 
-    std::pair<int,int> indicesForLocalPeaks= getTwoLocalPeaksOnHistogram(lanePointDistributionVector);
-    int maxIndex= indicesForLocalPeaks.first;
-    int secondMaxIndex= indicesForLocalPeaks.second;
+    std::pair<int, int> indicesForLocalPeaks = getTwoLocalPeaksOnHistogram(lanePointDistributionVector);
+    int maxIndex = indicesForLocalPeaks.first;
+    int secondMaxIndex = indicesForLocalPeaks.second;
 
     int yTopLeftPoint = imageSize.height - rectangleHeight;
     int xTopLeftPoint = maxIndex * (rectangleWidth);
@@ -262,6 +256,31 @@ float calculateXIntercept(cv::Size imageSize, const std::vector<float> &polynomi
     return xAtIntercept;
 }
 
+float calculateXatGivenY(float y, const std::vector<float> &polynomialCoefficients)
+{
+
+    float c = polynomialCoefficients[0];
+    float b = polynomialCoefficients[1];
+    float a = polynomialCoefficients[2];
+    float xResult = (a * y * y + b * y + c);
+    return xResult;
+}
+
+void addPolynomialCurveToImage(cv::Mat editedImage, std::vector<float> &coefficients)
+{
+
+    std::vector<cv::Point> polynomialCurve;
+
+    for (int y = editedImage.size().height; y >= 0; y -= 10)
+    {
+
+        cv::Point pointOnLine(calculateXatGivenY(y, coefficients), y);
+        polynomialCurve.push_back(pointOnLine);
+    }
+
+    cv::polylines(editedImage, polynomialCurve, false, cv::Scalar(255, 0, 0));
+}
+
 /**
  * Get the distance to the center of the two lanes (Error Signal)
  *
@@ -299,6 +318,10 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
 
     leastSquareSum.fitIt(firstCurvePointCluster, 2, coefficientsForLeftQuadratic);
     leastSquareSum.fitIt(secondCurvePointCluster, 2, coefficientsForRightQuadratic);
+
+
+    addPolynomialCurveToImage(projectedImage,coefficientsForLeftQuadratic);
+    addPolynomialCurveToImage(projectedImage,coefficientsForRightQuadratic);
 
     cv::rectangle(projectedImage, rectRegions.first, cv::Scalar(255, 0, 0));
     cv::rectangle(projectedImage, rectRegions.second, cv::Scalar(255, 0, 0));
