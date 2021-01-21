@@ -177,7 +177,11 @@ std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
         float averageXCoordinate = detectedLanePoints.empty() ? currentX : sumOfXCoordinates / detectedLanePoints.size();
 
         cv::Point point(averageXCoordinate, window.y + window.height * 0.5f);
-        gatheredPoints.push_back(point);
+
+        if(!detectedLanePoints.empty())
+        {
+            gatheredPoints.push_back(point);
+        }
 
         // Shift the window up
         window.y -= window.height;
