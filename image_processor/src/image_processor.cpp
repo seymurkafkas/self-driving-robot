@@ -367,7 +367,7 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
 
     float error = (projectedImage.size().width / 2) - ((firstXIntercept + secondXIntercept) / 2)  ;
     //Find x intersection
-    std::cout << "Error :" << error << std::endl;
+   // std::cout << "Error :" << error << std::endl;
     return error;
 }
 
@@ -420,7 +420,7 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
 int main(int argc, char **argv)
 {
     angularVelocityController= new PID_Controller();
-    ros::init(argc, argv, "image_processor");
+    ros::init(argc, argv, "image_processor");   
     ros::NodeHandle nh;
     cv::namedWindow("Turtlebot");
     motor_command_publisher = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/navi", 100);
