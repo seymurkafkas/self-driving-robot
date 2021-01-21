@@ -10,6 +10,26 @@
 geometry_msgs::Twist motor_command;
 ros::Publisher motor_command_publisher;
 
+int robotState = 2; // 0: Halt, 1: Drive at 50% Speed , 2: Drive at 100% Speed
+float baseLinearVelocity = 0.55;
+
+float robotStateMultiplier()
+{
+    float multiplier = 0;
+    switch (robotState)
+    {
+    case 0:
+        break;
+    case 1:
+        multiplier = 0.5;
+        break;
+    case 2:
+        multiplier = 1;
+        break;
+    }
+    return multiplier;
+}
+
 /**
  * Find the number of nonblack pixels in each X Partition and return them in an array
  *
@@ -178,7 +198,7 @@ std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
 
         cv::Point point(averageXCoordinate, window.y + window.height * 0.5f);
 
-        if(!detectedLanePoints.empty())
+        if (!detectedLanePoints.empty())
         {
             gatheredPoints.push_back(point);
         }
@@ -310,7 +330,7 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     //
     //cv::Mat visualHistogram = getVisualisedHistogram(histogram, 10);
 
-    std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 4, 6);
+    std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 6, 6);
 
     std::vector<cv::Point2f> firstCurvePointCluster = slidingWindowMethod(projectedImage, rectRegions.first);
     std::vector<cv::Point2f> secondCurvePointCluster = slidingWindowMethod(projectedImage, rectRegions.second);
@@ -373,8 +393,18 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
         // std::vector< cv::Point2f > gatherPoints= slidingWindowMethod(projectedImage,cv::Rect(cv::Point(55,150),cv::Point(65,160)));
         float errorSignal = calculateDistanceToLaneCenter(cameraImage);
 
-        motor_command.linear.x = 0.50;
-        motor_command.angular.z = -errorSignal * 0.01;
+        if (robotState == 0)
+        {
+            motor_command.linear.x = baseLinearVelocity * robotStateMultiplier();
+            motor_command.angular.z = -errorSignal * 0.01;
+        }
+        else
+        {
+
+            motor_command.linear.x = baseLinearVelocity * robotStateMultiplier();
+            motor_command.angular.z = -errorSignal * 0.01;
+        }
+
         motor_command_publisher.publish(motor_command);
         //  cv::imshow("view", projectedImage);
         cv::waitKey(30);
