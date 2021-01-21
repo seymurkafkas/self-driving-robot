@@ -7,6 +7,7 @@
 #include "polynomial_fit.h"
 #include "geometry_msgs/Twist.h"
 #include "pid_controller.h"
+#include "std_msgs/Int32.h"
 
 geometry_msgs::Twist motor_command;
 ros::Publisher motor_command_publisher;
@@ -16,6 +17,46 @@ int robotState = 2; // 0: Halt, 1: Drive at 50% Speed , 2: Drive at 100% Speed
 float baseLinearVelocity = 0.50;
 
 
+//0 Default (No sign is detected)
+//3 Stop Sign
+//2 Speed Sign
+//1 Slow Sign
+
+
+//Yıldız  1
+
+//Üçgen  2
+
+//Altıgen  3
+
+enum Sign { noSignDetected, slowSign,speedSign,stopSign};
+
+int stateTransitionFunction(Sign detectedSign){
+
+if(detectedSign==noSignDetected){return robotState;}
+
+if(detectedSign==stopSign){
+    std::cout<<"Stopping..."<<std::endl;
+    return 0;
+}
+if(detectedSign==speedSign){
+    std::cout<<"100% Speed"<<std::endl;
+
+    return 2;
+}
+if(detectedSign==slowSign){
+    std::cout<<"50% Speed"<<std::endl;
+
+    return 1;
+}
+
+}
+
+
+void changeState(Sign detectedSign){
+
+robotState=stateTransitionFunction(detectedSign);
+}
 
 float robotStateMultiplier()
 {
@@ -357,6 +398,7 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     cv::rectangle(colouredProjectedImage, rectRegions.second, cv::Scalar(224, 255, 255));
     //
 
+
     cv::rectangle(projectedImage, rectRegions.first, cv::Scalar(255, 0, 0));
     cv::rectangle(projectedImage, rectRegions.second, cv::Scalar(255, 0, 0));
 
@@ -365,9 +407,9 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     float firstXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForLeftQuadratic);
     float secondXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForRightQuadratic);
 
-    float error = (projectedImage.size().width / 2) - ((firstXIntercept + secondXIntercept) / 2)  ;
+    float error = (projectedImage.size().width / 2) - ((firstXIntercept + secondXIntercept) / 2);
     //Find x intersection
-   // std::cout << "Error :" << error << std::endl;
+    // std::cout << "Error :" << error << std::endl;
     return error;
 }
 
@@ -407,7 +449,7 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
         }
 
         motor_command_publisher.publish(motor_command);
-        //  cv::imshow("view", projectedImage);
+
         cv::waitKey(30);
     }
 
@@ -417,15 +459,23 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
     }
 }
 
+void stateCallback(const std_msgs::Int32::ConstPtr &sign)
+{
+ int detectedSign(sign->data);
+    std::cout<<detectedSign<<std::endl;
+    // changeState(Sign(detectedSign));
+}
+
 int main(int argc, char **argv)
 {
-    angularVelocityController= new PID_Controller();
-    ros::init(argc, argv, "image_processor");   
+    angularVelocityController = new PID_Controller();
+    ros::init(argc, argv, "image_processor");
     ros::NodeHandle nh;
     cv::namedWindow("Turtlebot");
     motor_command_publisher = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/navi", 100);
     image_transport::ImageTransport it(nh);
     image_transport::Subscriber sub = it.subscribe("camera/rgb/image_raw", 1, rawImageCallback);
+    ros::Subscriber stateSub= nh.subscribe("/state",1,stateCallback);
     ros::spin();
     cv::destroyWindow("view");
 }
