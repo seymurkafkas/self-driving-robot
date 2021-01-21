@@ -330,7 +330,7 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     //
     //cv::Mat visualHistogram = getVisualisedHistogram(histogram, 10);
 
-    std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 6, 6);
+    std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 4, 12);
 
     std::vector<cv::Point2f> firstCurvePointCluster = slidingWindowMethod(projectedImage, rectRegions.first);
     std::vector<cv::Point2f> secondCurvePointCluster = slidingWindowMethod(projectedImage, rectRegions.second);
@@ -356,10 +356,6 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     cv::rectangle(projectedImage, rectRegions.second, cv::Scalar(255, 0, 0));
 
     cv::imshow("projection", colouredProjectedImage);
-
-    /*     std::cout << "a: " << coefficientsForLeftQuadratic[0] << "  b: " << coefficientsForLeftQuadratic[1] << "   c: " << coefficientsForLeftQuadratic[2] << std::endl;
-    std::cout << "2nd ONE: " << std::endl;
-    std::cout << "a: " << coefficientsForRightQuadratic[0] << "  b: " << coefficientsForRightQuadratic[1] << "   c: " << coefficientsForRightQuadratic[2] << std::endl; */
 
     float firstXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForLeftQuadratic);
     float secondXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForRightQuadratic);
