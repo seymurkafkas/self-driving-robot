@@ -25,7 +25,7 @@ std::vector<int> getPointDistribution(cv::Mat binaryImage, int histogramSize, in
     int rectangleHeight = imageSize.height / verticalSize;
     int rectangleWidth = imageSize.width / histogramSize;
     std::vector<int> pointDistributionAcrossX;
-    cv::Point topLeftPoint(0, imageSize.height-rectangleHeight);
+    cv::Point topLeftPoint(0, imageSize.height - rectangleHeight);
     cv::Mat histogram;
     cv::Point bottomRightPoint(rectangleWidth, imageSize.height);
     cv::Rect verticalBin(topLeftPoint, bottomRightPoint);
@@ -278,7 +278,7 @@ void addPolynomialCurveToImage(cv::Mat editedImage, std::vector<float> &coeffici
         polynomialCurve.push_back(pointOnLine);
     }
 
-    cv::polylines(editedImage, polynomialCurve, false, cv::Scalar(255, 0, 0));
+    cv::polylines(editedImage, polynomialCurve, false, cv::Scalar(255, 0, 255), 3);
 }
 
 /**
@@ -319,14 +319,19 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     leastSquareSum.fitIt(firstCurvePointCluster, 2, coefficientsForLeftQuadratic);
     leastSquareSum.fitIt(secondCurvePointCluster, 2, coefficientsForRightQuadratic);
 
-
-    addPolynomialCurveToImage(projectedImage,coefficientsForLeftQuadratic);
-    addPolynomialCurveToImage(projectedImage,coefficientsForRightQuadratic);
+    // Plot the curve in color in the projected Image
+    cv::Mat colouredProjectedImage;
+    cv::cvtColor(projectedImage, colouredProjectedImage, cv::COLOR_GRAY2BGR);
+    addPolynomialCurveToImage(colouredProjectedImage, coefficientsForLeftQuadratic);
+    addPolynomialCurveToImage(colouredProjectedImage, coefficientsForRightQuadratic);
+    cv::rectangle(colouredProjectedImage, rectRegions.first, cv::Scalar(224, 255, 255));
+    cv::rectangle(colouredProjectedImage, rectRegions.second, cv::Scalar(224, 255, 255));
+    //
 
     cv::rectangle(projectedImage, rectRegions.first, cv::Scalar(255, 0, 0));
     cv::rectangle(projectedImage, rectRegions.second, cv::Scalar(255, 0, 0));
 
-    cv::imshow("projection", projectedImage);
+    cv::imshow("projection", colouredProjectedImage);
 
     /*     std::cout << "a: " << coefficientsForLeftQuadratic[0] << "  b: " << coefficientsForLeftQuadratic[1] << "   c: " << coefficientsForLeftQuadratic[2] << std::endl;
     std::cout << "2nd ONE: " << std::endl;
@@ -346,7 +351,7 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
     try
     {
         cv::Mat cameraImage = cv_bridge::toCvShare(msg, "bgr8")->image;
-        cv::Mat grayImageMatrix;
+        /*  cv::Mat grayImageMatrix;
 
         cv::cvtColor(cameraImage, grayImageMatrix, cv::COLOR_BGR2GRAY);
         cv::Mat blurredImage;
@@ -359,13 +364,13 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
         std::vector<int> histogram = getPointDistribution(projectedImage, 10, 10);
         cv::Mat visualHistogram = getVisualisedHistogram(histogram, 10);
 
-        std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 4, 8);
+        std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 4, 8); */
 
         // std::vector< cv::Point2f > gatherPoints= slidingWindowMethod(projectedImage,cv::Rect(cv::Point(55,150),cv::Point(65,160)));
         float errorSignal = calculateDistanceToLaneCenter(cameraImage);
 
-        motor_command.linear.x = 0.55;
-        motor_command.angular.z = -errorSignal * 0.004;
+        motor_command.linear.x = 0.50;
+        motor_command.angular.z = -errorSignal * 0.01;
         motor_command_publisher.publish(motor_command);
         //  cv::imshow("view", projectedImage);
         cv::waitKey(30);
