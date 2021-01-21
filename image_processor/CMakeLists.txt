@@ -153,6 +153,10 @@ include
    ${catkin_LIBRARIES} ${OpenCV_LIBS}
  )
 
+ catkin_install_python(PROGRAMS src/state_publisher.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 #############
 ## Install ##
 #############
