@@ -101,7 +101,7 @@ return std::make_pair(maxIndex,secondMaxIndex);
 /**
  * Find the lowermost lane windows, to be used in the Sliding Window Method
  *
- * @param binaryImage Binary image on which histogram poeration will be applied.
+ * @param binaryImage Binary image on which histogram operation will be applied.
  * @param histogramSize The number of bins to which the X axis is partitioned.
  * @return Two lowermost rectangles containing the lane points
  */
@@ -171,10 +171,10 @@ std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
         cv::Mat subRegion = image(window); //Extract region of interest
         std::vector<cv::Point> detectedLanePoints;
 
-        cv::findNonZero(subRegion, detectedLanePoints); //Get all non-black pixels. All are white in our case
+        cv::findNonZero(subRegion, detectedLanePoints); //Get all lane pixels
         float sumOfXCoordinates = 0.0f;
 
-        for (int i = 0; i < detectedLanePoints.size(); ++i) //Calculate average X position
+        for (int i = 0; i < detectedLanePoints.size(); ++i) //Calculate X mean of points
         {
             float x = detectedLanePoints[i].x;
             sumOfXCoordinates += window.x + x;
@@ -185,20 +185,20 @@ std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
         cv::Point point(averageXCoordinate, window.y + window.height * 0.5f);
         gatheredPoints.push_back(point);
 
-        //Move the window up
+        // Shift the window up
         window.y -= window.height;
 
-        //For the uppermost position
+        //Check if the window reached the upper end
         if (window.y < 0)
         {
             window.y = 0;
             reachedUpperBoundary = true;
         }
 
-        //Move x position
+        //Shift X
         window.x += (point.x - currentX);
 
-        //Make sure the window doesn't overflow, we get an error if we try to get data outside the matrix
+        //Make sure the window doesn't overflow, otherwise segmentation fault occurs
         if (window.x < 0)
             window.x = 0;
         if (window.x + window.width >= imageSize.width)
@@ -232,8 +232,6 @@ cv::Mat maskImage(cv::Mat image)
 cv::Mat projectImage(const cv::Mat &image)
 
 {
-    // todo do some checks on input.
-
     cv::Point2f source_points[4];
     cv::Point2f dest_points[4];
 
@@ -245,13 +243,11 @@ cv::Mat projectImage(const cv::Mat &image)
     dest_points[0] = cv::Point2f(0, 600);
     dest_points[1] = cv::Point2f(0, 0);
     dest_points[2] = cv::Point2f(800, 0);
-
     dest_points[3] = cv::Point2f(800, 600);
 
     cv::Mat dst;
     cv::Mat transformMatrix = cv::getPerspectiveTransform(source_points, dest_points);
     cv::warpPerspective(image, dst, transformMatrix, image.size());
-
     return dst;
 }
 
@@ -261,11 +257,8 @@ float calculateXIntercept(cv::Size imageSize, const std::vector<float> &polynomi
     float c = polynomialCoefficients[0];
     float b = polynomialCoefficients[1];
     float a = polynomialCoefficients[2];
-
     float y = imageSize.height;
-
     float xAtIntercept = (a * y * y + b * y + c);
-
     return xAtIntercept;
 }
 
@@ -323,7 +316,6 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     //Find x intersection
     std::cout << "Error :" << error << std::endl;
     return error;
-    //Return (xIntersectionFirst+XıntersectionSecond/2 )-(rawImage.size().width/2)
 }
 
 void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
@@ -368,14 +360,6 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     cv::namedWindow("Turtlebot");
     motor_command_publisher = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/navi", 100);
-    /*     PolynomialRegression<float> leastSquareSum;
-    std::vector<cv::Point2f> testPoints;
-    testPoints.push_back(cv::Point2f(250, 10));
-    testPoints.push_back(cv::Point2f(5250, 50));
-    testPoints.push_back(cv::Point2f(13200, 80));
-    std::vector<float> coefficients;
-    leastSquareSum.fitIt(testPoints, 2, coefficients);
-    std::cout << "a: " << coefficients[0] << "  b: " << coefficients[1] << "   c: " << coefficients[2] << std::endl; */
     image_transport::ImageTransport it(nh);
     image_transport::Subscriber sub = it.subscribe("camera/rgb/image_raw", 1, rawImageCallback);
     ros::spin();
