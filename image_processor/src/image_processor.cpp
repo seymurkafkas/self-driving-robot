@@ -41,22 +41,19 @@ std::vector<int> getPointDistribution(cv::Mat binaryImage, int histogramSize, in
     return pointDistributionAcrossX;
 }
 
+
+
+
+
 /**
- * Find the lowermost lane windows, to be used in the Sliding Window Method
+ * Find the bin indices for the most populated two bins in histogram.
  *
- * @param binaryImage Binary image on which histogram poeration will be applied.
- * @param histogramSize The number of bins to which the X axis is partitioned.
- * @return Two lowermost rectangles containing the lane points
+ * @param lanePointDistributionVector The vector holding the counted lane pixels per bin.
+ * @return The pair of max and second max indices (maxIndex,secondMaxIndex)
  */
-std::pair<cv::Rect, cv::Rect> getLowermostLaneRegions(cv::Mat binaryImage, int histogramSize, int verticalSize)
+
+std::pair<int,int> getTwoLocalPeaksOnHistogram(std::vector<int> lanePointDistributionVector)
 {
-
-    cv::Size imageSize = binaryImage.size();
-    int rectangleHeight = imageSize.height / verticalSize;
-    int rectangleWidth = imageSize.width / histogramSize;
-
-    std::vector<int> lanePointDistributionVector = getPointDistribution(binaryImage, histogramSize, verticalSize);
-
     int maxNumberOfPoints, secondMaxNumberOfPoints, maxIndex, secondMaxIndex;
 
     if (std::max(lanePointDistributionVector[0], lanePointDistributionVector[1]) == lanePointDistributionVector[0])
@@ -95,6 +92,31 @@ std::pair<cv::Rect, cv::Rect> getLowermostLaneRegions(cv::Mat binaryImage, int h
             secondMaxIndex = i;
         }
     }
+
+return std::make_pair(maxIndex,secondMaxIndex);
+}
+
+
+
+/**
+ * Find the lowermost lane windows, to be used in the Sliding Window Method
+ *
+ * @param binaryImage Binary image on which histogram poeration will be applied.
+ * @param histogramSize The number of bins to which the X axis is partitioned.
+ * @return Two lowermost rectangles containing the lane points
+ */
+std::pair<cv::Rect, cv::Rect> getLowermostLaneRegions(cv::Mat binaryImage, int histogramSize, int verticalSize)
+{
+
+    cv::Size imageSize = binaryImage.size();
+    int rectangleHeight = imageSize.height / verticalSize;
+    int rectangleWidth = imageSize.width / histogramSize;
+
+    std::vector<int> lanePointDistributionVector = getPointDistribution(binaryImage, histogramSize, verticalSize);
+
+    std::pair<int,int> indicesForLocalPeaks= getTwoLocalPeaksOnHistogram(lanePointDistributionVector);
+    int maxIndex= indicesForLocalPeaks.first;
+    int secondMaxIndex= indicesForLocalPeaks.second;
 
     int yTopLeftPoint = imageSize.height - rectangleHeight;
     int xTopLeftPoint = maxIndex * (rectangleWidth);
