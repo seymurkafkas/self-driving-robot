@@ -6,12 +6,16 @@
 #include <math.h>
 #include "polynomial_fit.h"
 #include "geometry_msgs/Twist.h"
+#include "pid_controller.h"
 
 geometry_msgs::Twist motor_command;
 ros::Publisher motor_command_publisher;
+PID_Controller *angularVelocityController;
 
 int robotState = 2; // 0: Halt, 1: Drive at 50% Speed , 2: Drive at 100% Speed
-float baseLinearVelocity = 0.55;
+float baseLinearVelocity = 0.50;
+
+
 
 float robotStateMultiplier()
 {
@@ -19,6 +23,7 @@ float robotStateMultiplier()
     switch (robotState)
     {
     case 0:
+        multiplier = 0;
         break;
     case 1:
         multiplier = 0.5;
@@ -360,7 +365,7 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     float firstXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForLeftQuadratic);
     float secondXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForRightQuadratic);
 
-    float error = ((firstXIntercept + secondXIntercept) / 2) - (projectedImage.size().width / 2);
+    float error = (projectedImage.size().width / 2) - ((firstXIntercept + secondXIntercept) / 2)  ;
     //Find x intersection
     std::cout << "Error :" << error << std::endl;
     return error;
@@ -392,13 +397,13 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
         if (robotState == 0)
         {
             motor_command.linear.x = baseLinearVelocity * robotStateMultiplier();
-            motor_command.angular.z = -errorSignal * 0.01;
+            motor_command.angular.z = 0;
         }
         else
         {
 
             motor_command.linear.x = baseLinearVelocity * robotStateMultiplier();
-            motor_command.angular.z = -errorSignal * 0.01;
+            motor_command.angular.z = angularVelocityController->getPIDOutput(errorSignal);
         }
 
         motor_command_publisher.publish(motor_command);
@@ -414,6 +419,7 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
 
 int main(int argc, char **argv)
 {
+    angularVelocityController= new PID_Controller();
     ros::init(argc, argv, "image_processor");
     ros::NodeHandle nh;
     cv::namedWindow("Turtlebot");
