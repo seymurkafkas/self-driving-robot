@@ -154,9 +154,6 @@ std::pair<int, int> getTwoLocalPeaksOnHistogram(std::vector<int> lanePointDistri
 
     for (int i = 2; i < lanePointDistributionVector.size(); i++)
     {
-        //      std::cout << "Current: " << lanePointDistributionVector[i] << std::endl;
-        //     std::cout << "maxIndex: " << maxIndex << std::endl;
-        //     std::cout << "Second max index: " << secondMaxIndex << std::endl;
 
         if (maxNumberOfPoints <= lanePointDistributionVector[i])
         {
@@ -447,6 +444,11 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     }
 
     float error = (projectedImage.size().width / 2) - ((firstXIntercept + secondXIntercept) / 2);
+
+
+ 
+
+
     return error;
 }
 
@@ -455,22 +457,6 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
     try
     {
         cv::Mat cameraImage = cv_bridge::toCvShare(msg, "bgr8")->image;
-        /*  cv::Mat grayImageMatrix;
-
-        cv::cvtColor(cameraImage, grayImageMatrix, cv::COLOR_BGR2GRAY);
-        cv::Mat blurredImage;
-        cv::GaussianBlur(grayImageMatrix, blurredImage, cv::Size(5, 5), 1);
-        cv::Mat lineImage;
-        cv::Canny(blurredImage, lineImage, 100, 150, 5, true);
-        cv::Mat maskedImage = maskImage(lineImage);
-        cv::Mat projectedImage = projectImage(lineImage);
-
-        std::vector<int> histogram = getPointDistribution(projectedImage, 10, 10);
-        cv::Mat visualHistogram = getVisualisedHistogram(histogram, 10);
-
-        std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 4, 8); */
-
-        // std::vector< cv::Point2f > gatherPoints= slidingWindowMethod(projectedImage,cv::Rect(cv::Point(55,150),cv::Point(65,160)));
         float errorSignal = calculateDistanceToLaneCenter(cameraImage);
 
         if (robotState == 0)
@@ -499,8 +485,7 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
 void stateCallback(const std_msgs::Int32::ConstPtr &sign)
 {
     int detectedSign(sign->data);
-    std::cout << detectedSign << std::endl;
-     changeState(Sign(detectedSign));
+    changeState(Sign(detectedSign));
 }
 
 int main(int argc, char **argv)
