@@ -14,48 +14,65 @@ ros::Publisher motor_command_publisher;
 PID_Controller *angularVelocityController;
 
 int robotState = 2; // 0: Halt, 1: Drive at 50% Speed , 2: Drive at 100% Speed
-float baseLinearVelocity = 0.50;
-
+float baseLinearVelocity = 0.40;
 
 //0 Default (No sign is detected)
 //3 Stop Sign
 //2 Speed Sign
 //1 Slow Sign
 
+//Start->  1
 
-//Yıldız  1
+//Triangle -> 2
 
-//Üçgen  2
+//Hexagon -> 3
 
-//Altıgen  3
+enum Sign
+{
+    noSignDetected,
+    slowSign,
+    speedSign,
+    stopSign
+};
 
-enum Sign { noSignDetected, slowSign,speedSign,stopSign};
+/**
+ * Get the next state, given the detected sign
+ *
+ * @param detectedSign the integer identifier of the detected sign.
+ * @return The integer identifier of the next state.
+ */
 
-int stateTransitionFunction(Sign detectedSign){
+int stateTransitionFunction(Sign detectedSign)
+{
 
-if(detectedSign==noSignDetected){return robotState;}
+    if (detectedSign == noSignDetected)
+    {
+        return robotState;
+    }
 
-if(detectedSign==stopSign){
-    std::cout<<"Stopping..."<<std::endl;
-    return 0;
+    if (detectedSign == stopSign)
+    {
+        std::cout << "Stopping..." << std::endl;
+        return 0;
+    }
+    if (detectedSign == speedSign)
+    {
+        std::cout << "100% Speed" << std::endl;
+
+        return 2;
+    }
+    if (detectedSign == slowSign)
+    {
+        std::cout << "50% Speed" << std::endl;
+
+        return 1;
+    }
 }
-if(detectedSign==speedSign){
-    std::cout<<"100% Speed"<<std::endl;
 
-    return 2;
-}
-if(detectedSign==slowSign){
-    std::cout<<"50% Speed"<<std::endl;
+void changeState(Sign detectedSign)
+{
 
-    return 1;
-}
-
-}
-
-
-void changeState(Sign detectedSign){
-
-robotState=stateTransitionFunction(detectedSign);
+    robotState = stateTransitionFunction(detectedSign);
 }
 
 float robotStateMultiplier()
@@ -165,6 +182,7 @@ std::pair<int, int> getTwoLocalPeaksOnHistogram(std::vector<int> lanePointDistri
  * @param histogramSize The number of bins to which the X axis is partitioned.
  * @return Two lowermost rectangles containing the lane points
  */
+
 std::pair<cv::Rect, cv::Rect> getLowermostLaneRegions(cv::Mat binaryImage, int histogramSize, int verticalSize)
 {
 
@@ -202,7 +220,6 @@ cv::Mat getVisualisedHistogram(std::vector<int> histogram, int histogramSize)
     float maximumPointCount = *std::max_element(histogram.begin(), histogram.end());
     for (int i = 1; i < histogramSize; i++)
     {
-        //      std::cout << "At index " << i << ": " << cvRound(histogram.at(i - 1)) << std::endl;
         cv::line(histImage, cv::Point(bin_w * (i - 1), hist_h - cvRound(histogram.at(i - 1)) * hist_h / maximumPointCount),
                  cv::Point(bin_w * (i), hist_h - cvRound(histogram.at(i)) * hist_h / maximumPointCount),
                  cv::Scalar(255, 0, 0), 2, 8, 0);
@@ -338,7 +355,10 @@ float calculateXatGivenY(float y, const std::vector<float> &polynomialCoefficien
 
 void addPolynomialCurveToImage(cv::Mat editedImage, std::vector<float> &coefficients)
 {
-
+    if (coefficients.empty())
+    {
+        return;
+    }
     std::vector<cv::Point> polynomialCurve;
 
     for (int y = editedImage.size().height; y >= 0; y -= 10)
@@ -386,8 +406,18 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     PolynomialRegression<float> leastSquareSum;
     std::vector<float> coefficientsForLeftQuadratic, coefficientsForRightQuadratic;
 
-    leastSquareSum.fitIt(firstCurvePointCluster, 2, coefficientsForLeftQuadratic);
-    leastSquareSum.fitIt(secondCurvePointCluster, 2, coefficientsForRightQuadratic);
+    bool firstLaneWithinBounds = (!firstCurvePointCluster.empty());
+
+    bool secondLaneWithinBounds = (!secondCurvePointCluster.empty());
+    if (firstLaneWithinBounds)
+    {
+        leastSquareSum.fitIt(firstCurvePointCluster, 2, coefficientsForLeftQuadratic);
+    }
+
+    if (secondLaneWithinBounds)
+    {
+        leastSquareSum.fitIt(secondCurvePointCluster, 2, coefficientsForRightQuadratic);
+    }
 
     // Plot the curve in color in the projected Image
     cv::Mat colouredProjectedImage;
@@ -398,18 +428,25 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     cv::rectangle(colouredProjectedImage, rectRegions.second, cv::Scalar(224, 255, 255));
     //
 
-
     cv::rectangle(projectedImage, rectRegions.first, cv::Scalar(255, 0, 0));
     cv::rectangle(projectedImage, rectRegions.second, cv::Scalar(255, 0, 0));
 
     cv::imshow("projection", colouredProjectedImage);
-
-    float firstXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForLeftQuadratic);
-    float secondXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForRightQuadratic);
+    float firstXIntercept, secondXIntercept;
+    if (firstLaneWithinBounds)
+    {
+        firstXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForLeftQuadratic);
+    }
+    if (secondLaneWithinBounds)
+    {
+        secondXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForRightQuadratic);
+    }
+    else
+    {
+        secondXIntercept = (firstXIntercept >= (rawImage.size().width / 2)) ? 0 : rawImage.size().width;
+    }
 
     float error = (projectedImage.size().width / 2) - ((firstXIntercept + secondXIntercept) / 2);
-    //Find x intersection
-    // std::cout << "Error :" << error << std::endl;
     return error;
 }
 
@@ -461,8 +498,8 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
 
 void stateCallback(const std_msgs::Int32::ConstPtr &sign)
 {
- int detectedSign(sign->data);
-    std::cout<<detectedSign<<std::endl;
+    int detectedSign(sign->data);
+    std::cout << detectedSign << std::endl;
     // changeState(Sign(detectedSign));
 }
 
@@ -475,7 +512,7 @@ int main(int argc, char **argv)
     motor_command_publisher = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/navi", 100);
     image_transport::ImageTransport it(nh);
     image_transport::Subscriber sub = it.subscribe("camera/rgb/image_raw", 1, rawImageCallback);
-    ros::Subscriber stateSub= nh.subscribe("/state",1,stateCallback);
+    ros::Subscriber stateSub = nh.subscribe("/state", 1, stateCallback);
     ros::spin();
     cv::destroyWindow("view");
 }
