@@ -63,7 +63,7 @@ def image_callback(rawImage):
         min_xvalue=min(x_values)
         max_xvalue=max(x_values)        
 
-    if largestArea > frame_area*0.04 and min_xvalue > 10 and min_yvalue > 10 and max_xvalue < 790 and max_yvalue < 290:
+    if largestArea > frame_area*0.07 and min_xvalue > 10 and min_yvalue > 10 and max_xvalue < 790 and max_yvalue < 290:
         print(largestRect)
         print(largestRect.shape)   
         cv2.drawContours(crop_img,[largestRect],0,(0,0,255),2)

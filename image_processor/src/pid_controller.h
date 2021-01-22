@@ -10,16 +10,16 @@ class PID_Controller
 public:
     PID_Controller()
     {
-        Kp = 0.012;
-        Kd = 0.002;
-        Ki = 0.001;
+        Kp = 0.009;
+        Kd = 0.0015;
+        Ki = 0.0005;
         maxIntegrator = 200;
         minIntegrator = -200;
         previousError = 0.0;
         integrator = 0.0;
 
-        maxAngularVelocity = 66;
-        minAngularVelocity = -66;
+        maxAngularVelocity = 2;
+        minAngularVelocity = -2;
     }
     ~PID_Controller()
     {

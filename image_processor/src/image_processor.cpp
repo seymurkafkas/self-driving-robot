@@ -500,7 +500,7 @@ void stateCallback(const std_msgs::Int32::ConstPtr &sign)
 {
     int detectedSign(sign->data);
     std::cout << detectedSign << std::endl;
-    // changeState(Sign(detectedSign));
+     changeState(Sign(detectedSign));
 }
 
 int main(int argc, char **argv)
