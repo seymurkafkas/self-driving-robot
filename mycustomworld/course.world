@@ -1,5 +1,125 @@
 <sdf version='1.6'>
   <world name='default'>
+    <model name='stop'>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='body'>
+        <visual name='visual'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://stop/stop.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://stop/stop.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+    </model>
+    <model name='forward'>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='body'>
+        <visual name='visual'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://forward/forward.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://forward/forward.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+    </model>
+    <model name='slow'>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='body'>
+        <visual name='visual'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://slow/slow.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <collision name='collision'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://slow/slow.dae</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+      </link>
+    </model>
     <scene>
       <ambient>0 0 0 1</ambient>
       <shadows>0</shadows>
@@ -26,7 +146,7 @@
         <collision name='ground_coll'>
           <geometry>
             <box>
-              <size>18 32 0.1</size>
+              <size>7 13.02 0.1</size>
             </box>
           </geometry>
           <surface>
@@ -46,7 +166,7 @@
         <visual name='ground_vis'>
           <geometry>
             <box>
-              <size>18 32 0.1</size>
+              <size>7 13.02 0.1</size>
             </box>
           </geometry>
           <material>
@@ -829,11 +949,11 @@
           <always_on>1</always_on>
           <update_rate>20</update_rate>
           <camera name='__default__'>
-            <horizontal_fov>1.0472</horizontal_fov>
+            <horizontal_fov>1.6</horizontal_fov>
             <image>
               <format>B8G8R8</format>
-              <width>640</width>
-              <height>480</height>
+              <width>800</width>
+              <height>600</height>
             </image>
             <clip>
               <near>0.05</near>
@@ -859,7 +979,7 @@
             <pointCloudCutoff>0.4</pointCloudCutoff>
             <robotNamespace>/</robotNamespace>
           </plugin>
-          <pose frame=''>-0.118 0 0.2812 0 -0 0</pose>
+          <pose frame=''>0.03 0 0.2812 0 -0 0</pose>
         </sensor>
         <velocity_decay/>
         <velocity_decay/>
@@ -1189,52 +1309,146 @@
       <pose frame=''>0 0 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>229 859000000</sim_time>
-      <real_time>60 238061888</real_time>
-      <wall_time>1610468493 884067273</wall_time>
-      <iterations>59410</iterations>
+      <sim_time>2420 179000000</sim_time>
+      <real_time>2329 200887434</real_time>
+      <wall_time>1611281978 523298885</wall_time>
+      <iterations>1822676</iterations>
+      <model name='forward'>
+        <pose frame=''>4.06738 0.907538 -0.996922 0.017307 0.002352 1.07841</pose>
+        <scale>1 1 1</scale>
+        <link name='body'>
+          <pose frame=''>4.06738 0.907538 -0.996922 0.017307 0.002352 1.07841</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
       <model name='ground'>
-        <pose frame=''>1 2.3 -0.1 0 -0 0</pose>
+        <pose frame=''>0.99999 2.23028 -0.1 0 -0.007865 0</pose>
         <scale>1 1 1</scale>
         <link name='ground'>
-          <pose frame=''>1 2.3 -0.1 0 -0 0</pose>
+          <pose frame=''>0.99999 2.23028 -0.1 0 -0.007865 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='mobile_base'>
-        <pose frame=''>3.95452 -1.38741 -0.050241 0.000972 -0.014452 0.839221</pose>
+        <pose frame=''>-1.24764 6.93198 -0.067921 0.003005 -0.006842 -2.87399</pose>
         <scale>1 1 1</scale>
         <link name='base_footprint'>
-          <pose frame=''>3.95452 -1.38741 -0.050241 0.000972 -0.014452 0.839221</pose>
-          <velocity>0.001766 -0.000506 0.000803 0.005763 -0.003077 0.000524</velocity>
-          <acceleration>-0.095322 -0.020833 0.122217 0.038761 -1.17136 0.482309</acceleration>
-          <wrench>-0.469108 -0.102525 0.601464 0 -0 0</wrench>
+          <pose frame=''>-1.24764 6.93198 -0.067921 0.003005 -0.006842 -2.87399</pose>
+          <velocity>0.000739 -0.000659 0.000317 -0.009634 -0.008879 -0.002654</velocity>
+          <acceleration>-0.175379 0.307468 -0.040368 0.885809 1.31475 0.727092</acceleration>
+          <wrench>-0.863095 1.51314 -0.198664 0 -0 0</wrench>
         </link>
         <link name='wheel_left_link'>
-          <pose frame=''>3.86864 -1.311 -0.01479 -1.56984 0.04565 0.839278</pose>
-          <velocity>0.001617 -0.000754 0.000979 0.005763 -0.003077 0.000524</velocity>
-          <acceleration>-1.52176 0.764463 0.048975 -0.971654 -1.32647 0.257086</acceleration>
-          <wrench>-0.015218 0.007645 0.00049 0 -0 0</wrench>
+          <pose frame=''>-1.21703 6.82126 -0.032233 1.56735 0.513793 0.265928</pose>
+          <velocity>0.00013 -0.000397 0.001655 -0.009634 -0.008879 -0.002654</velocity>
+          <acceleration>-0.850268 1.04771 -0.734407 -0.173886 -0.919084 -2.78642</acceleration>
+          <wrench>-0.008503 0.010477 -0.007344 0 -0 0</wrench>
         </link>
         <link name='wheel_right_link'>
-          <pose frame=''>4.03978 -1.46463 -0.015009 -1.56982 -0.056737 0.83918</pose>
-          <velocity>0.001698 -0.000663 0.00062 0.005763 -0.003077 0.000524</velocity>
-          <acceleration>-1.60302 0.616298 0.619044 -0.902474 -0.36011 -2.85882</acceleration>
-          <wrench>-0.01603 0.006163 0.00619 0 -0 0</wrench>
+          <pose frame=''>-1.27784 7.04305 -0.03293 -1.56743 -0.46644 -2.87549</pose>
+          <velocity>0.000724 -0.000243 -0.001021 -0.009634 -0.008879 -0.002654</velocity>
+          <acceleration>-1.22714 1.015 2.21145 -0.990258 -0.597574 0.372721</acceleration>
+          <wrench>-0.012271 0.01015 0.022114 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='slow'>
+        <pose frame=''>-2.32327 2.7992 -0.887041 -0.061635 0.104768 -0.017798</pose>
+        <scale>1 1 1</scale>
+        <link name='body'>
+          <pose frame=''>-2.32327 2.7992 -0.887041 -0.061635 0.104768 -0.017798</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='stop'>
+        <pose frame=''>0.144869 6.33621 -0.850014 -0.031677 -0 -2.83495</pose>
+        <scale>1 1 1</scale>
+        <link name='body'>
+          <pose frame=''>0.144869 6.33621 -0.850014 -0.031677 -0 -2.83495</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <light name='sun'>
         <pose frame=''>0 0 10 0 -0 0</pose>
       </light>
+      <light name='user_point_light_0'>
+        <pose frame=''>-2.26298 -4.11713 1 0 -0 0</pose>
+      </light>
+      <light name='user_point_light_1'>
+        <pose frame=''>4.35234 -4.11964 1 0 -0 0</pose>
+      </light>
+      <light name='user_point_light_2'>
+        <pose frame=''>-2.34731 8.40886 1 0 -0 0</pose>
+      </light>
+      <light name='user_point_light_3'>
+        <pose frame=''>4.33912 8.35156 1 0 -0 0</pose>
+      </light>
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>12.4018 -14.3755 22.2084 0 0.9018 1.7242</pose>
+        <pose frame=''>4.38876 -3.06739 14.1235 -1.3e-05 1.18689 1.93135</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
     </gui>
+    <light name='user_point_light_0' type='point'>
+      <pose frame=''>-2.26298 -4.11713 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
+    <light name='user_point_light_1' type='point'>
+      <pose frame=''>4.35234 -4.11964 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
+    <light name='user_point_light_2' type='point'>
+      <pose frame=''>-2.34731 8.40886 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
+    <light name='user_point_light_3' type='point'>
+      <pose frame=''>4.33912 8.35156 1 0 -0 0</pose>
+      <diffuse>0.5 0.5 0.5 1</diffuse>
+      <specular>0.1 0.1 0.1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <cast_shadows>0</cast_shadows>
+      <direction>0 0 -1</direction>
+    </light>
   </world>
 </sdf>
