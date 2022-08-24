@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>image_processor</name>
+  <name>autonomous-robot</name>
   <version>0.0.0</version>
-  <description>The image_processor package</description>
+  <description>Contains the state publisher, the polynomial solver, the PID controller and the image processor.</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->

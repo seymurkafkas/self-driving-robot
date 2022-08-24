@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(image_processor)
+project(autonomous-robot)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -136,7 +136,7 @@ include
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
- add_executable(image_processor_node src/image_processor.cpp)
+ add_executable(${PROJECT_NAME}_node src/ImageProcessor.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -153,7 +153,7 @@ include
    ${catkin_LIBRARIES} ${OpenCV_LIBS}
  )
 
- catkin_install_python(PROGRAMS src/state_publisher.py
+ catkin_install_python(PROGRAMS src/sign_publisher.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

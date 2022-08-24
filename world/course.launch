@@ -2,7 +2,7 @@
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="use_sim_time" value="true"/>
     <arg name="debug" value="false"/>
-    <arg name="world_name" value="$(find mycustomworld)/course.world"/>
+    <arg name="world_name" value="$(find world)/course.world"/>
   </include>
 
   <include file="$(find turtlebot_gazebo)/launch/includes/kobuki.launch.xml">

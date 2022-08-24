@@ -4,9 +4,9 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <math.h>
-#include "polynomial_fit.h"
+#include "Polynomial.h"
 #include "geometry_msgs/Twist.h"
-#include "pid_controller.h"
+#include "PIDController.h"
 #include "std_msgs/Int32.h"
 
 geometry_msgs::Twist motor_command;
