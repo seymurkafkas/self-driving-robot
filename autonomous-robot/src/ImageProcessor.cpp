@@ -9,63 +9,59 @@
 #include "PIDController.h"
 #include "std_msgs/Int32.h"
 
+enum RobotState
+{
+    HALT = 0,
+    SLOW = 1,
+    REGULAR = 2
+};
+
+enum SignEvent
+{
+    NO_SIGN_DETECTED = 0,
+    SLOW_SIGN_DETECTED = 1,  // Star
+    SPEED_SIGN_DETECTED = 2, // Triangle
+    HALT_SIGN_DETECTED = 3   // Hexagon
+};
+
 geometry_msgs::Twist motor_command;
 ros::Publisher motor_command_publisher;
 PIDController *angularVelocityController;
-
-int robotState = 2; // 0: Halt, 1: Drive at 50% Speed , 2: Drive at 100% Speed
+RobotState robotState = REGULAR;
 float baseLinearVelocity = 0.40;
-
-// 0 Default (No sign is detected)
-// 3 Stop Sign
-// 2 Speed Sign
-// 1 Slow Sign
-
-// Start->  1
-// Triangle -> 2
-// Hexagon -> 3
-
-enum Sign
-{
-    noSignDetected,
-    slowSign,
-    speedSign,
-    stopSign
-};
 
 /**
  * Get the next state, given the detected sign
- *
- * @param detectedSign the integer identifier of the detected sign.
- * @return The integer identifier of the next state.
+ * @param detectedSign the integer identifier of the detected sign event
+ * @param currentState the integer identifier of the current state the robot is in
+ * @return The identifier of the next state
  */
-int stateTransitionFunction(Sign detectedSign)
+RobotState stateTransitionFunction(RobotState currentState, SignEvent detectedSign)
 {
-    if (detectedSign == noSignDetected)
+    if (detectedSign == NO_SIGN_DETECTED)
     {
-        return robotState;
+        return currentState;
     }
-
-    if (detectedSign == stopSign)
+    if (detectedSign == HALT_SIGN_DETECTED)
     {
         std::cout << "Stopping..." << std::endl;
-        return 0;
+        return HALT;
     }
-    if (detectedSign == speedSign)
+    if (detectedSign == SPEED_SIGN_DETECTED)
     {
         std::cout << "100% Speed" << std::endl;
-        return 2;
+        return REGULAR;
     }
-    if (detectedSign == slowSign)
+    if (detectedSign == SLOW_SIGN_DETECTED)
     {
         std::cout << "50% Speed" << std::endl;
-        return 1;
+        return SLOW;
     }
 }
 
-void changeState(Sign detectedSign)
+void changeState(SignEvent detectedSign)
 {
-    robotState = stateTransitionFunction(detectedSign);
+    robotState = stateTransitionFunction(robotState, detectedSign);
 }
 
 float robotStateMultiplier()
@@ -73,13 +69,13 @@ float robotStateMultiplier()
     float multiplier = 0;
     switch (robotState)
     {
-    case 0:
+    case HALT:
         multiplier = 0;
         break;
-    case 1:
+    case SLOW:
         multiplier = 0.5;
         break;
-    case 2:
+    case REGULAR:
         multiplier = 1;
         break;
     }
@@ -115,7 +111,7 @@ std::vector<int> getPointDistribution(cv::Mat binaryImage, int histogramSize, in
 }
 
 /**
- * Find the bin indices for the most populated two bins in histogram.
+ * Finds and returns the bin indices for the most populated two bins in histogram.
  *
  * @param lanePointDistributionVector The vector holding the counted lane pixels per bin.
  * @return The pair of max and second max indices (maxIndex,secondMaxIndex)
@@ -223,7 +219,7 @@ std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
     const cv::Size imageSize = image.size();
     bool reachedUpperBoundary = false;
 
-    while (true)
+    for (; window.y >= 0; window.y -= window.height)
     {
         float currentX = window.x + window.width * 0.5f;
         cv::Mat subRegion = image(window);
@@ -239,21 +235,8 @@ std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
 
         float averageXCoordinate = detectedLanePoints.empty() ? currentX : sumOfXCoordinates / detectedLanePoints.size();
         cv::Point point(averageXCoordinate, window.y + window.height * 0.5f);
-
         if (!detectedLanePoints.empty())
             gatheredPoints.push_back(point);
-
-        // Shift the window up
-        window.y -= window.height;
-
-        // Check if the window reached the upper end
-        if (window.y < 0)
-        {
-            window.y = 0;
-            reachedUpperBoundary = true;
-        }
-
-        // Shift X
         window.x += (point.x - currentX);
 
         bool overflowsTowardsLeft = window.x < 0;
@@ -262,8 +245,6 @@ std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
             window.x = 0;
         if (overflowsTowardsRight)
             window.x = imageSize.width - window.width - 1;
-        if (reachedUpperBoundary)
-            break;
     }
 
     return gatheredPoints;
@@ -334,7 +315,6 @@ void addPolynomialCurveToImage(cv::Mat editedImage, std::vector<float> &coeffici
 
     for (int y = editedImage.size().height; y >= 0; y -= 10)
     {
-
         cv::Point pointOnLine(calculateXatGivenY(y, coefficients), y);
         polynomialCurve.push_back(pointOnLine);
     }
@@ -397,26 +377,32 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     return error;
 }
 
+float getAngularVelocityCommand(float error)
+{
+    if (robotState == HALT)
+        return 0;
+    return angularVelocityController->getPIDOutput(error);
+}
+
+float getLinearVelocityCommand()
+{
+    return baseLinearVelocity * robotStateMultiplier();
+}
+
+void sendMotionCommand(RobotState state, float error)
+{
+    motor_command.linear.x = getLinearVelocityCommand();
+    motor_command.angular.z = getAngularVelocityCommand(error);
+    motor_command_publisher.publish(motor_command);
+}
+
 void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
 {
     try
     {
         cv::Mat cameraImage = cv_bridge::toCvShare(msg, "bgr8")->image;
         float errorSignal = calculateDistanceToLaneCenter(cameraImage);
-
-        if (robotState == 0)
-        {
-            motor_command.linear.x = baseLinearVelocity * robotStateMultiplier();
-            motor_command.angular.z = 0;
-        }
-        else
-        {
-
-            motor_command.linear.x = baseLinearVelocity * robotStateMultiplier();
-            motor_command.angular.z = angularVelocityController->getPIDOutput(errorSignal);
-        }
-
-        motor_command_publisher.publish(motor_command);
+        sendMotionCommand(robotState, errorSignal);
         cv::waitKey(30);
     }
 
@@ -429,7 +415,7 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
 void stateCallback(const std_msgs::Int32::ConstPtr &sign)
 {
     int detectedSign(sign->data);
-    changeState(Sign(detectedSign));
+    changeState(SignEvent(detectedSign));
 }
 
 int main(int argc, char **argv)

@@ -15,7 +15,7 @@ Run the following commands in order:
 ```sh
 roslaunch world course.launch
 rosrun autonomous-robot autonomous-robot-node
-rosrun image_processor state_publisher.py
+rosrun autonomous-robot sign_publisher.py
 ```
 
 
