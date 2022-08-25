@@ -1,6 +1,6 @@
 #include <iostream>
 
-class PID_Controller
+class PIDController
 {
     double Kp, Kd, Ki;                   //proportional ,derivative and integral constants
     double maxIntegrator, minIntegrator; // upper and lower bounds
@@ -8,7 +8,7 @@ class PID_Controller
     double maxAngularVelocity, minAngularVelocity;
 
 public:
-    PID_Controller()
+    PIDController()
     {
         Kp = 0.009;
         Kd = 0.0015;
@@ -21,7 +21,7 @@ public:
         maxAngularVelocity = 2;
         minAngularVelocity = -2;
     }
-    ~PID_Controller()
+    ~PIDController()
     {
     }
 
@@ -32,18 +32,11 @@ public:
         previousError = newError;
         integrator += newError;
         if (integrator > maxIntegrator)
-        {
             integrator = maxIntegrator;
-        }
         else if (integrator < minIntegrator)
-        {
             integrator = minIntegrator;
-        }
         double integralComponent = Ki * integrator;
-
         double totalOutput = proportionalComponent + integralComponent + derivativeComponent;
-
-        //std::cout<<totalOutput<<std::endl;
         return std::min(maxAngularVelocity, std::max(minAngularVelocity, totalOutput));
     }
 };

@@ -11,7 +11,7 @@
 
 geometry_msgs::Twist motor_command;
 ros::Publisher motor_command_publisher;
-PID_Controller *angularVelocityController;
+PIDController *angularVelocityController;
 
 int robotState = 2; // 0: Halt, 1: Drive at 50% Speed , 2: Drive at 100% Speed
 float baseLinearVelocity = 0.40;
@@ -58,13 +58,11 @@ int stateTransitionFunction(Sign detectedSign)
     if (detectedSign == speedSign)
     {
         std::cout << "100% Speed" << std::endl;
-
         return 2;
     }
     if (detectedSign == slowSign)
     {
         std::cout << "50% Speed" << std::endl;
-
         return 1;
     }
 }
@@ -490,7 +488,7 @@ void stateCallback(const std_msgs::Int32::ConstPtr &sign)
 
 int main(int argc, char **argv)
 {
-    angularVelocityController = new PID_Controller();
+    angularVelocityController = new PIDController();
     ros::init(argc, argv, "image_processor");
     ros::NodeHandle nh;
     cv::namedWindow("Turtlebot");
