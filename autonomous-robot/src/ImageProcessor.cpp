@@ -16,16 +16,14 @@ PIDController *angularVelocityController;
 int robotState = 2; // 0: Halt, 1: Drive at 50% Speed , 2: Drive at 100% Speed
 float baseLinearVelocity = 0.40;
 
-//0 Default (No sign is detected)
-//3 Stop Sign
-//2 Speed Sign
-//1 Slow Sign
+// 0 Default (No sign is detected)
+// 3 Stop Sign
+// 2 Speed Sign
+// 1 Slow Sign
 
-//Start->  1
-
-//Triangle -> 2
-
-//Hexagon -> 3
+// Start->  1
+// Triangle -> 2
+// Hexagon -> 3
 
 enum Sign
 {
@@ -41,10 +39,8 @@ enum Sign
  * @param detectedSign the integer identifier of the detected sign.
  * @return The integer identifier of the next state.
  */
-
 int stateTransitionFunction(Sign detectedSign)
 {
-
     if (detectedSign == noSignDetected)
     {
         return robotState;
@@ -69,7 +65,6 @@ int stateTransitionFunction(Sign detectedSign)
 
 void changeState(Sign detectedSign)
 {
-
     robotState = stateTransitionFunction(detectedSign);
 }
 
@@ -98,10 +93,8 @@ float robotStateMultiplier()
  * @param histogramSize The number of bins to which the X axis is partitioned.
  * @return A vector of counted points at every given bin
  */
-
 std::vector<int> getPointDistribution(cv::Mat binaryImage, int histogramSize, int verticalSize)
 {
-
     cv::Size imageSize = binaryImage.size();
     int rectangleHeight = imageSize.height / verticalSize;
     int rectangleWidth = imageSize.width / histogramSize;
@@ -110,12 +103,11 @@ std::vector<int> getPointDistribution(cv::Mat binaryImage, int histogramSize, in
     cv::Mat histogram;
     cv::Point bottomRightPoint(rectangleWidth, imageSize.height);
     cv::Rect verticalBin(topLeftPoint, bottomRightPoint);
-    //   std::cout << "------------------------------" << std::endl;
+
     for (int i = 0; i < histogramSize; i++)
     {
         int currentPointCount = cv::countNonZero(binaryImage(verticalBin));
         pointDistributionAcrossX.push_back(currentPointCount);
-        //      std::cout << currentPointCount << std::endl;
         verticalBin.x += rectangleWidth;
     }
 
@@ -128,7 +120,6 @@ std::vector<int> getPointDistribution(cv::Mat binaryImage, int histogramSize, in
  * @param lanePointDistributionVector The vector holding the counted lane pixels per bin.
  * @return The pair of max and second max indices (maxIndex,secondMaxIndex)
  */
-
 std::pair<int, int> getTwoLocalPeaksOnHistogram(std::vector<int> lanePointDistributionVector)
 {
     int maxNumberOfPoints, secondMaxNumberOfPoints, maxIndex, secondMaxIndex;
@@ -177,14 +168,11 @@ std::pair<int, int> getTwoLocalPeaksOnHistogram(std::vector<int> lanePointDistri
  * @param histogramSize The number of bins to which the X axis is partitioned.
  * @return Two lowermost rectangles containing the lane points
  */
-
 std::pair<cv::Rect, cv::Rect> getLowermostLaneRegions(cv::Mat binaryImage, int histogramSize, int verticalSize)
 {
-
     cv::Size imageSize = binaryImage.size();
     int rectangleHeight = imageSize.height / verticalSize;
     int rectangleWidth = imageSize.width / histogramSize;
-
     std::vector<int> lanePointDistributionVector = getPointDistribution(binaryImage, histogramSize, verticalSize);
 
     std::pair<int, int> indicesForLocalPeaks = getTwoLocalPeaksOnHistogram(lanePointDistributionVector);
@@ -229,7 +217,6 @@ cv::Mat getVisualisedHistogram(std::vector<int> histogram, int histogramSize)
  * @param window The rectangle indicating the starting window.
  * @return A vector collection of points which were extracted starting from the initial window
  */
-
 std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
 {
     std::vector<cv::Point2f> gatheredPoints;
@@ -239,42 +226,37 @@ std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
     while (true)
     {
         float currentX = window.x + window.width * 0.5f;
-
-        cv::Mat subRegion = image(window); //Extract region of interest
+        cv::Mat subRegion = image(window); // Extract region of interest
         std::vector<cv::Point> detectedLanePoints;
-
-        cv::findNonZero(subRegion, detectedLanePoints); //Get all lane pixels
+        cv::findNonZero(subRegion, detectedLanePoints); // Get all lane pixels
         float sumOfXCoordinates = 0.0f;
 
-        for (int i = 0; i < detectedLanePoints.size(); ++i) //Calculate X mean of points
+        for (int i = 0; i < detectedLanePoints.size(); ++i) // Calculate X mean of points
         {
             float x = detectedLanePoints[i].x;
             sumOfXCoordinates += window.x + x;
         }
 
         float averageXCoordinate = detectedLanePoints.empty() ? currentX : sumOfXCoordinates / detectedLanePoints.size();
-
         cv::Point point(averageXCoordinate, window.y + window.height * 0.5f);
 
         if (!detectedLanePoints.empty())
-        {
             gatheredPoints.push_back(point);
-        }
 
         // Shift the window up
         window.y -= window.height;
 
-        //Check if the window reached the upper end
+        // Check if the window reached the upper end
         if (window.y < 0)
         {
             window.y = 0;
             reachedUpperBoundary = true;
         }
 
-        //Shift X
+        // Shift X
         window.x += (point.x - currentX);
 
-        //Make sure the window doesn't overflow, otherwise segmentation fault occurs
+        // Make sure the window doesn't overflow, otherwise segmentation fault occurs
         if (window.x < 0)
             window.x = 0;
         if (window.x + window.width >= imageSize.width)
@@ -297,11 +279,8 @@ cv::Mat maskImage(cv::Mat image)
         cv::Point(480, 245),
         cv::Point(610, 410)};
 
-    // Polygon mask
     cv::fillConvexPoly(mask, polygonBoundaries, 4, cv::Scalar(255, 255, 255));
-    // Multiply the edges image and the mask to get the output
     cv::bitwise_and(image, mask, maskedImage);
-
     return maskedImage;
 }
 
@@ -329,7 +308,6 @@ cv::Mat projectImage(const cv::Mat &image)
 
 float calculateXIntercept(cv::Size imageSize, const std::vector<float> &polynomialCoefficients)
 {
-
     float c = polynomialCoefficients[0];
     float b = polynomialCoefficients[1];
     float a = polynomialCoefficients[2];
@@ -340,7 +318,6 @@ float calculateXIntercept(cv::Size imageSize, const std::vector<float> &polynomi
 
 float calculateXatGivenY(float y, const std::vector<float> &polynomialCoefficients)
 {
-
     float c = polynomialCoefficients[0];
     float b = polynomialCoefficients[1];
     float a = polynomialCoefficients[2];
@@ -351,9 +328,8 @@ float calculateXatGivenY(float y, const std::vector<float> &polynomialCoefficien
 void addPolynomialCurveToImage(cv::Mat editedImage, std::vector<float> &coefficients)
 {
     if (coefficients.empty())
-    {
         return;
-    }
+
     std::vector<cv::Point> polynomialCurve;
 
     for (int y = editedImage.size().height; y >= 0; y -= 10)
@@ -372,10 +348,8 @@ void addPolynomialCurveToImage(cv::Mat editedImage, std::vector<float> &coeffici
  * @param rawImage The raw image with visible lane markers.
  * @return The distance (error) in length units
  */
-
 float calculateDistanceToLaneCenter(cv::Mat rawImage)
 {
-
     cv::Mat grayImageMatrix;
     cv::cvtColor(rawImage, grayImageMatrix, cv::COLOR_BGR2GRAY);
     cv::Mat blurredImage;
@@ -385,34 +359,19 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     cv::Mat maskedImage = maskImage(lineImage);
     cv::Mat projectedImage = projectImage(lineImage);
 
-    //Count of lane points after diving the image into vertical bins
-    //std::vector<int> histogram = getPointDistribution(projectedImage, 10, 10);
-
-    //
-    //cv::Mat visualHistogram = getVisualisedHistogram(histogram, 10);
-
     std::pair<cv::Rect, cv::Rect> rectRegions = getLowermostLaneRegions(projectedImage, 4, 12);
-
     std::vector<cv::Point2f> firstCurvePointCluster = slidingWindowMethod(projectedImage, rectRegions.first);
     std::vector<cv::Point2f> secondCurvePointCluster = slidingWindowMethod(projectedImage, rectRegions.second);
-
-    // Curve fit for both
 
     PolynomialRegression<float> leastSquareSum;
     std::vector<float> coefficientsForLeftQuadratic, coefficientsForRightQuadratic;
 
     bool firstLaneWithinBounds = (!firstCurvePointCluster.empty());
-
     bool secondLaneWithinBounds = (!secondCurvePointCluster.empty());
     if (firstLaneWithinBounds)
-    {
         leastSquareSum.fitIt(firstCurvePointCluster, 2, coefficientsForLeftQuadratic);
-    }
-
     if (secondLaneWithinBounds)
-    {
         leastSquareSum.fitIt(secondCurvePointCluster, 2, coefficientsForRightQuadratic);
-    }
 
     // Plot the curve in color in the projected Image
     cv::Mat colouredProjectedImage;
@@ -421,32 +380,20 @@ float calculateDistanceToLaneCenter(cv::Mat rawImage)
     addPolynomialCurveToImage(colouredProjectedImage, coefficientsForRightQuadratic);
     cv::rectangle(colouredProjectedImage, rectRegions.first, cv::Scalar(224, 255, 255));
     cv::rectangle(colouredProjectedImage, rectRegions.second, cv::Scalar(224, 255, 255));
-    //
 
     cv::rectangle(projectedImage, rectRegions.first, cv::Scalar(255, 0, 0));
     cv::rectangle(projectedImage, rectRegions.second, cv::Scalar(255, 0, 0));
-
     cv::imshow("projection", colouredProjectedImage);
     float firstXIntercept, secondXIntercept;
+
     if (firstLaneWithinBounds)
-    {
         firstXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForLeftQuadratic);
-    }
     if (secondLaneWithinBounds)
-    {
         secondXIntercept = calculateXIntercept(projectedImage.size(), coefficientsForRightQuadratic);
-    }
     else
-    {
         secondXIntercept = (firstXIntercept >= (rawImage.size().width / 2)) ? 0 : rawImage.size().width;
-    }
 
     float error = (projectedImage.size().width / 2) - ((firstXIntercept + secondXIntercept) / 2);
-
-
- 
-
-
     return error;
 }
 
@@ -470,7 +417,6 @@ void rawImageCallback(const sensor_msgs::ImageConstPtr &msg)
         }
 
         motor_command_publisher.publish(motor_command);
-
         cv::waitKey(30);
     }
 
