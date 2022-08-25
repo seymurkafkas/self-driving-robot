@@ -226,7 +226,7 @@ std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
     while (true)
     {
         float currentX = window.x + window.width * 0.5f;
-        cv::Mat subRegion = image(window); // Extract region of interest
+        cv::Mat subRegion = image(window);
         std::vector<cv::Point> detectedLanePoints;
         cv::findNonZero(subRegion, detectedLanePoints); // Get all lane pixels
         float sumOfXCoordinates = 0.0f;
@@ -256,12 +256,12 @@ std::vector<cv::Point2f> slidingWindowMethod(cv::Mat image, cv::Rect window)
         // Shift X
         window.x += (point.x - currentX);
 
-        // Make sure the window doesn't overflow, otherwise segmentation fault occurs
-        if (window.x < 0)
+        bool overflowsTowardsLeft = window.x < 0;
+        bool overflowsTowardsRight = window.x + window.width >= imageSize.width;
+        if (overflowsTowardsLeft)
             window.x = 0;
-        if (window.x + window.width >= imageSize.width)
+        if (overflowsTowardsRight)
             window.x = imageSize.width - window.width - 1;
-
         if (reachedUpperBoundary)
             break;
     }
