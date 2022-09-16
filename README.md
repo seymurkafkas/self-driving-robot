@@ -2,11 +2,12 @@
 
 ## Instructions
 
-Install OpenCV library for C++
-Install OpenCV for Python 3 through the console
+Install OpenCV (C++) and OpenCV-Python
+
 Create a Catkin Workspace and put the src folder inside
 
 Put the contents of the world/models folder inside ".gazebo/models"
+
 Run catkin_make
 
 After sourcing the bash file,
